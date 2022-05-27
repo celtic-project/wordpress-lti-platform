@@ -34,6 +34,9 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
     exit;
 }
 
+require_once('lti-platform.php');
+require_once('includes/class-lti-platform.php');
+
 global $wpdb;
 
 function lti_platform_delete_tools($post_type)
@@ -51,7 +54,15 @@ function lti_platform_delete_tools($post_type)
     }
 }
 
-$options = LTI_Platform_Tool::getOptions();  // Check if data should be deleted on uninstall
+// Check if data should be deleted on uninstall
+if (is_multisite()) {
+    $options = get_site_option(LTI_Platform::get_settings_name(), array());
+} else {
+    $options = get_option(LTI_Platform::get_settings_name(), array());
+}
+if (!is_array($options)) {
+    $options = array();
+}
 if (!empty($options['uninstall']) && ($options['uninstall'] === 'true')) {
     // Delete plugin options.
     $plugin_name = LTI_Platform::get_settings_name();
