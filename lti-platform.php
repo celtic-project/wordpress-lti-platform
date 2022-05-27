@@ -25,7 +25,7 @@
   Plugin Name: LTI Platform
   Plugin URI: http://www.spvsoftwareproducts.com/php/wordpress-lti-platform/
   Description: This plugin allows WordPress to act as a Platform using the IMS Learning Tools Interoperability (LTI) specification.
-  Version: 2.0.0
+  Version: 2.0.1
   Author: Stephen P Vickers
   Author URI: http://www.celtic-project.org/
   License: GPL3
@@ -44,7 +44,7 @@ define('LTI_PLATFORM_NAME', 'lti-platform');
 /**
  * Current plugin version.
  */
-define('LTI_PLATFORM_VERSION', '2.0.0');
+define('LTI_PLATFORM_VERSION', '2.0.1');
 
 /**
  * The core plugin class that is used to define internationalization,

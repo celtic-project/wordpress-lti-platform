@@ -1,6 +1,6 @@
 {
   "name": "celtic/wordpress-lti-platform",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Plugin to allow WordPress to act as an LTI platform",
   "keywords": ["wordpress", "plugin", "LTI", "platform", "tool"],
   "homepage": "https://www.spvsoftwareproducts.com/php/wordpress-lti-platform",
