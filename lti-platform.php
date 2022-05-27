@@ -64,7 +64,9 @@ require plugin_dir_path(__FILE__) . 'includes/class-lti-platform.php';
 function run_lti_platform()
 {
     $plugin = new LTI_Platform();
-    $plugin->run();
+    if ($plugin->isOK()) {
+        $plugin->run();
+    }
 }
 
 run_lti_platform();

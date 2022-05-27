@@ -77,6 +77,7 @@ class LTI_Platform
      * @var      DataConnector_wp    $ltiPlatformDataConnector    The LTI data connector.
      */
     public static $ltiPlatformDataConnector;
+    private $ok = true;
 
     /**
      * Define the core functionality of the plugin.
@@ -98,7 +99,8 @@ class LTI_Platform
         $this->define_admin_hooks();
         $this->define_public_hooks();
 
-        if (class_exists('DataConnector_wp')) {
+        $this->ok = $this->check_dependencies();
+        if ($this->ok && class_exists('DataConnector_wp')) {
             self::$ltiPlatformDataConnector = DataConnector_wp::createDataConnector($wpdb->dbh, $wpdb->base_prefix);
             if (defined('WP_NETWORK_ADMIN') && WP_NETWORK_ADMIN) {
                 self::$postType = LTI_Platform_Tool::POST_TYPE_NETWORK;
@@ -106,6 +108,11 @@ class LTI_Platform
                 self::$postType = LTI_Platform_Tool::POST_TYPE;
             }
         }
+    }
+
+    public function isOK()
+    {
+        return $this->ok;
     }
 
     /**
@@ -193,7 +200,6 @@ class LTI_Platform
     {
         $plugin_admin = new LTI_Platform_Admin(self::get_plugin_name(), $this->get_version());
 
-        $this->loader->add_action('wp_loaded', $plugin_admin, 'check_dependencies');
         $this->loader->add_action('admin_init', $plugin_admin, 'settings_init');
         $this->loader->add_action('admin_menu', $plugin_admin, 'options_page');
         $this->loader->add_action('network_admin_menu', $plugin_admin, 'network_options_page');
@@ -255,6 +261,15 @@ class LTI_Platform
         return $this->version;
     }
 
+    public function error_deactivate()
+    {
+        $allowed = array('em' => array());
+        echo('  <div class="notice notice-error">' . "\n");
+        echo('    <p>' . wp_kses(__('The <em>LTI  Platform</em> plugin has been deactivated because a dependency is missing; either use <em>Composer</em> to install the dependent libraries or activate the <em>ceLTIc LTI Library</em> plugin.',
+                self::get_plugin_name()), $allowed) . '</p>' . "\n");
+        echo('  </div>' . "\n");
+    }
+
     /**
      * The name of the plugin used to uniquely identify it within the context of
      * WordPress and to define internationalization functionality.
@@ -276,6 +291,33 @@ class LTI_Platform
     public static function get_settings_name()
     {
         return str_replace('-', '_', LTI_PLATFORM_NAME) . '_options';
+    }
+
+    /**
+     * Check that the LTI class library is available.
+     *
+     * @since     2.0.1
+     * @return    bool    True if the library is found.
+     */
+    private function check_lti_library()
+    {
+        return class_exists('ceLTIc\LTI\Platform');
+    }
+
+    private function check_dependencies()
+    {
+        $ok = $this->check_lti_library();
+        if (!$ok) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+            add_action('all_admin_notices', array($this, 'error_deactivate'));
+            $plugin_name = self::get_plugin_name();
+            deactivate_plugins("{$plugin_name}/{$plugin_name}.php");
+            if (isset($_GET['activate'])) {
+                unset($_GET['activate']);
+            }
+        }
+
+        return $ok;
     }
 
 }

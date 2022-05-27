@@ -172,18 +172,6 @@ class LTI_Platform_Admin
         return $submenu_file;
     }
 
-    public function check_dependencies()
-    {
-        if (!self::lti_tool_check_lti_library()) {
-            require_once ABSPATH . 'wp-admin/includes/plugin.php';
-            add_action('all_admin_notices', array($this, 'error_deactivate'));
-            deactivate_plugins("{$this->plugin_name}/{$this->plugin_name}.php");
-            if (isset($_GET['activate'])) {
-                unset($_GET['activate']);
-            }
-        }
-    }
-
     public function settings_init()
     {
         register_setting(LTI_Platform::get_plugin_name(), LTI_Platform::get_settings_name());
@@ -347,15 +335,6 @@ class LTI_Platform_Admin
         require_once plugin_dir_path(dirname(__FILE__)) . 'admin/partials/lti-platform-admin-edit.php';
     }
 
-    function error_deactivate()
-    {
-        $allowed = array('em' => array());
-        echo('  <div class="notice notice-error">' . "\n");
-        echo('    <p>' . wp_kses(__('The <em>LTI  Platform</em> plugin has been deactivated because a dependency is missing; either use <em>Composer</em> to install the dependent libraries or activate the <em>ceLTIc LTI Library</em> plugin.',
-                LTI_Platform::get_plugin_name()), $allowed) . '</p>' . "\n");
-        echo('  </div>' . "\n");
-    }
-
     function error_update()
     {
         $allowed = array('em' => array());
@@ -406,15 +385,6 @@ class LTI_Platform_Admin
             $tool->signatureMethod = 'RS256';
         }
         $tool->save();
-    }
-
-    /* -------------------------------------------------------------------
-     * Check that the LTI class library is available
-      ------------------------------------------------------------------ */
-
-    private static function lti_tool_check_lti_library()
-    {
-        return class_exists('ceLTIc\LTI\Tool');
     }
 
 }
