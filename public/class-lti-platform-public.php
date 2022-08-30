@@ -346,12 +346,7 @@ class LTI_Platform_Public
             }
             LTI\Tool::$defaultTool = $tool;
             $platform = $this->get_platform();
-            $html = $platform->sendMessage($url, $msg, $params);
-            $html = str_replace('//<![CDATA[', '', $html);
-            $html = str_replace('//]]>', '', $html);
-            $allowed = array('html' => array(), 'head' => array(), 'title' => array(), 'script' => array('type' => true), 'body' => array(),
-                'form' => array('action' => true, 'method' => true, 'target' => true, 'enctype' => true), 'input' => array('type' => true, 'name' => true, 'value' => true));
-            echo(wp_kses($html, $allowed));
+            echo($platform->sendMessage($url, $msg, $params));
             $day = date('Y-m-d');
             if ($day !== date('Y-m-d', $tool->lastAccess)) {
                 $tool->lastAccess = strtotime($day);  // Update last access
