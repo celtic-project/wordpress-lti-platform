@@ -150,7 +150,8 @@ echo('              ' . esc_html__('Custom parameters', LTI_Platform::get_plugin
 echo('            </label>' . "\n");
 echo('          </th>' . "\n");
 echo('          <td>' . "\n");
-echo('            <textarea id="id_custom" name="custom" class="regular-text">' . esc_textarea($tool->getSetting('custom')) . '</textarea>' . "\n");
+echo('            <textarea id="id_custom" name="custom" class="regular-text">' . esc_textarea(str_replace('&#13;&#10;', "\r\n",
+        $tool->getSetting('custom'))) . '</textarea>' . "\n");
 echo('            <p class="description">' . esc_html__('Use a format of "name=value", one per line.',
     LTI_Platform::get_plugin_name()) . '</p>' . "\n");
 echo('          </td>' . "\n");
