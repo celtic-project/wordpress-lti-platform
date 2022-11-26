@@ -251,6 +251,8 @@ class LTI_Platform_Public
         if ($ok) {
             $options = LTI_Platform_Tool::getOptions();
             $user = wp_get_current_user();
+            LTI\Tool::$defaultTool = $tool;
+            $platform = $this->get_platform();
             if (!empty($link_atts['title'])) {
                 $title = $link_atts['title'];
             } else {
@@ -316,10 +318,16 @@ class LTI_Platform_Public
                 $params['lis_person_contact_email_primary'] = $user->user_email;
             }
             if ($tool->getSetting('sendUserRole', 'false') === 'true') {
-                if (current_user_can('manage_options')) {
-                    $params['roles'] = 'urn:lti:instrole:ims/lis/Instructor';
+                if ($platform->ltiVersion !== LTI\Util::LTI_VERSION1P3) {
+                    if (current_user_can('manage_options')) {
+                        $params['roles'] = 'urn:lti:instrole:ims/lis/Instructor';
+                    } else {
+                        $params['roles'] = 'urn:lti:instrole:ims/lis/Learner';
+                    }
+                } elseif (current_user_can('manage_options')) {
+                    $params['roles'] = 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor';
                 } else {
-                    $params['roles'] = 'urn:lti:instrole:ims/lis/Learner';
+                    $params['roles'] = 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner';
                 }
             }
             if ($tool->getSetting('sendUserUsername', 'false') === 'true') {
@@ -344,8 +352,6 @@ class LTI_Platform_Public
                     }
                 }
             }
-            LTI\Tool::$defaultTool = $tool;
-            $platform = $this->get_platform();
             echo($platform->sendMessage($url, $msg, $params));
             $day = date('Y-m-d');
             if ($day !== date('Y-m-d', $tool->lastAccess)) {
@@ -402,8 +408,6 @@ class LTI_Platform_Public
         $platform->platformId = get_option('siteurl');
         $platform->clientId = LTI\Tool::$defaultTool->code;
         $platform->deploymentId = strval(get_current_blog_id());
-        $platform->ltiVersion = LTI\Util::LTI_VERSION1P3;
-        $platform->signatureMethod = 'RS256';
         $platform->kid = $options['kid'];
         $platform->rsaKey = $options['privatekey'];
         if (!LTI\Tool::$defaultTool->canUseLTI13()) {
