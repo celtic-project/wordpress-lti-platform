@@ -320,9 +320,9 @@ class LTI_Platform_Public
             if ($tool->getSetting('sendUserRole', 'false') === 'true') {
                 if ($platform->ltiVersion !== LTI\Util::LTI_VERSION1P3) {
                     if (current_user_can('manage_options')) {
-                        $params['roles'] = 'urn:lti:instrole:ims/lis/Instructor';
+                        $params['roles'] = 'urn:lti:role:ims/lis/Instructor';
                     } else {
-                        $params['roles'] = 'urn:lti:instrole:ims/lis/Learner';
+                        $params['roles'] = 'urn:lti:role:ims/lis/Learner';
                     }
                 } elseif (current_user_can('manage_options')) {
                     $params['roles'] = 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor';
