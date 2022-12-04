@@ -51,10 +51,10 @@ class LTI_Platform_Platform extends Platform
      */
     protected function onInitiateLogin(&$url, &$loginHint, &$ltiMessageHint, $params)
     {
+        $ltiMessageHint = null;
         $user = wp_get_current_user();
         $data = array(
             'login_hint' => $loginHint,
-            'lti_message_hint' => $ltiMessageHint,
             'params' => $params
         );
         update_user_option($user->ID, LTI_Platform::get_plugin_name() . '-login', $data);
