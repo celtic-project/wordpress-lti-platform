@@ -183,13 +183,13 @@ class LTI_Platform_Admin
         );
         add_settings_field('field_debug', __('Debug mode?', LTI_Platform::get_plugin_name()), array($this, 'field_checkbox'),
             LTI_Platform::get_plugin_name(), 'section_general',
-            array('class' => 'row', 'label_for' => 'id_debug', 'name' => 'debug', 'options' => $options));
+            array('label_for' => 'id_debug', 'name' => 'debug', 'options' => $options));
         add_settings_field('field_uninstall', __('Delete data on uninstall?', LTI_Platform::get_plugin_name()),
             array($this, 'field_checkbox'), LTI_Platform::get_plugin_name(), 'section_general',
-            array('class' => 'row', 'label_for' => 'id_uninstall', 'name' => 'uninstall', 'options' => $options));
+            array('label_for' => 'id_uninstall', 'name' => 'uninstall', 'options' => $options));
         add_settings_field('field_platformguid', __('Platform GUID', LTI_Platform::get_plugin_name()), array($this, 'field_text'),
             LTI_Platform::get_plugin_name(), 'section_general',
-            array('class' => 'row', 'label_for' => 'id_platformguid', 'name' => 'platformguid', 'options' => $options));
+            array('label_for' => 'id_platformguid', 'name' => 'platformguid', 'options' => $options));
 
         add_settings_section(
             'section_privacy', __('Privacy Settings', LTI_Platform::get_plugin_name()), array($this, 'section_privacy'),
@@ -197,19 +197,19 @@ class LTI_Platform_Admin
         );
         add_settings_field('field_name', __('Send user\'s name?', LTI_Platform::get_plugin_name()), array($this, 'field_checkbox'),
             LTI_Platform::get_plugin_name(), 'section_privacy',
-            array('class' => 'row', 'label_for' => 'id_sendusername', 'name' => 'sendusername', 'options' => $options));
+            array('label_for' => 'id_sendusername', 'name' => 'sendusername', 'options' => $options));
         add_settings_field('field_id', __('Send user\'s ID?', LTI_Platform::get_plugin_name()), array($this, 'field_checkbox'),
             LTI_Platform::get_plugin_name(), 'section_privacy',
-            array('class' => 'row', 'label_for' => 'id_senduserid', 'name' => 'senduserid', 'options' => $options));
+            array('label_for' => 'id_senduserid', 'name' => 'senduserid', 'options' => $options));
         add_settings_field('field_email', __('Send user\'s email?', LTI_Platform::get_plugin_name()),
             array($this, 'field_checkbox'), LTI_Platform::get_plugin_name(), 'section_privacy',
-            array('class' => 'row', 'label_for' => 'id_senduseremail', 'name' => 'senduseremail', 'options' => $options));
+            array('label_for' => 'id_senduseremail', 'name' => 'senduseremail', 'options' => $options));
         add_settings_field('field_role', __('Send user\'s role?', LTI_Platform::get_plugin_name()), array($this, 'field_checkbox'),
             LTI_Platform::get_plugin_name(), 'section_privacy',
-            array('class' => 'row', 'label_for' => 'id_senduserrole', 'name' => 'senduserrole', 'options' => $options));
+            array('label_for' => 'id_senduserrole', 'name' => 'senduserrole', 'options' => $options));
         add_settings_field('field_username', __('Send user\'s username?', LTI_Platform::get_plugin_name()),
             array($this, 'field_checkbox'), LTI_Platform::get_plugin_name(), 'section_privacy',
-            array('class' => 'row', 'label_for' => 'id_senduserusername', 'name' => 'senduserusername', 'options' => $options));
+            array('label_for' => 'id_senduserusername', 'name' => 'senduserusername', 'options' => $options));
 
         add_settings_section(
             'section_presentation', __('Presentation Settings', LTI_Platform::get_plugin_name()),
@@ -217,13 +217,13 @@ class LTI_Platform_Admin
         );
         add_settings_field('field_target', __('Presentation target', LTI_Platform::get_plugin_name()), array($this, 'field_target'),
             LTI_Platform::get_plugin_name(), 'section_presentation',
-            array('class' => 'row', 'label_for' => 'id_presentationtarget', 'name' => 'presentationtarget', 'options' => $options));
+            array('label_for' => 'id_presentationtarget', 'name' => 'presentationtarget', 'options' => $options));
         add_settings_field('field_width', __('Width of pop-up window or iframe', LTI_Platform::get_plugin_name()),
             array($this, 'field_text'), LTI_Platform::get_plugin_name(), 'section_presentation',
-            array('class' => 'row', 'label_for' => 'id_presentationwidth', 'name' => 'presentationwidth', 'options' => $options));
+            array('label_for' => 'id_presentationwidth', 'name' => 'presentationwidth', 'options' => $options));
         add_settings_field('field_height', __('Height of pop-up window or iframe', LTI_Platform::get_plugin_name()),
             array($this, 'field_text'), LTI_Platform::get_plugin_name(), 'section_presentation',
-            array('class' => 'row', 'label_for' => 'id_presentationheight', 'name' => 'presentationheight', 'options' => $options));
+            array('label_for' => 'id_presentationheight', 'name' => 'presentationheight', 'options' => $options));
 
         add_settings_section(
             'section_security', __('Security Settings', LTI_Platform::get_plugin_name()), array($this, 'section_security'),
@@ -231,10 +231,10 @@ class LTI_Platform_Admin
         );
         add_settings_field('field_kid', __('Key ID', LTI_Platform::get_plugin_name()), array($this, 'field_text'),
             LTI_Platform::get_plugin_name(), 'section_security',
-            array('class' => 'row', 'label_for' => 'id_kid', 'name' => 'kid', 'options' => $options));
+            array('label_for' => 'id_kid', 'name' => 'kid', 'options' => $options));
         add_settings_field('field_privatekey', __('Private key', LTI_Platform::get_plugin_name()), array($this, 'field_textarea'),
             LTI_Platform::get_plugin_name(), 'section_security',
-            array('class' => 'row', 'label_for' => 'id_privatekey', 'name' => 'privatekey', 'options' => $options));
+            array('label_for' => 'id_privatekey', 'name' => 'privatekey', 'rows' => '10', 'cols' => '65', 'options' => $options));
     }
 
     public function section_general()
@@ -274,7 +274,7 @@ class LTI_Platform_Admin
 
     public function field_textarea($args)
     {
-        echo('<textarea id=" ' . esc_attr($args['label_for']) . '" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . ']" class="regular-text">');
+        echo('<textarea id=" ' . esc_attr($args['label_for']) . '" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . ']" class="code" rows="' . esc_attr($args['rows']) . '" cols="' . esc_attr($args['cols']) . '">');
         if (isset($args['options'][$args['name']])) {
             echo($args['options'][$args['name']]);
         }
