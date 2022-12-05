@@ -318,17 +318,63 @@ class LTI_Platform_Public
                 $params['lis_person_contact_email_primary'] = $user->user_email;
             }
             if ($tool->getSetting('sendUserRole', 'false') === 'true') {
-                if ($platform->ltiVersion !== LTI\Util::LTI_VERSION1P3) {
-                    if (current_user_can('manage_options')) {
-                        $params['roles'] = 'urn:lti:role:ims/lis/Instructor';
-                    } else {
-                        $params['roles'] = 'urn:lti:role:ims/lis/Learner';
+                $roles = array();
+                foreach ($user->roles as $role) {
+                    if (!empty($options["role_{$role}"])) {
+                        $roles = array_merge($roles, explode(',', $tool->getSetting("role_{$role}", '')));
                     }
-                } elseif (current_user_can('manage_options')) {
-                    $params['roles'] = 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor';
-                } else {
-                    $params['roles'] = 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner';
                 }
+                $roles = array_unique($roles);
+                $ltiroles = array();
+                foreach ($roles as $role) {
+                    if ($platform->ltiVersion === LTI\Util::LTI_VERSION1) {
+                        switch ($role) {
+                            case 'administrator':
+                                $ltiroles[] = 'urn:lti:sysrole:ims/lis/Administrator';
+                                $ltiroles[] = 'urn:lti:instrole:ims/lis/Administrator';
+                                break;
+                            case 'contentdeveloper':
+                                $ltiroles[] = 'urn:lti:role:ims/lis/ContentDeveloper';
+                                break;
+                            case 'instructor':
+                                $ltiroles[] = 'urn:lti:role:ims/lis/Instructor';
+                                break;
+                            case 'learner':
+                                $ltiroles[] = 'urn:lti:role:ims/lis/Learner';
+                                break;
+                            case 'mentor':
+                                $ltiroles[] = 'urn:lti:role:ims/lis/Mentor';
+                                break;
+                            case 'teachingassistant':
+                                $ltiroles[] = 'urn:lti:role:ims/lis/TeachingAssistant';
+                                break;
+                        }
+                    } else {
+                        switch ($role) {
+                            case 'administrator':
+                                $ltiroles[] = 'http://purl.imsglobal.org/vocab/lis/v2/system/person#Administrator';
+                                $ltiroles[] = 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator';
+                                break;
+                            case 'contentdeveloper':
+                                $ltiroles[] = 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper';
+                                break;
+                            case 'instructor':
+                                $ltiroles[] = 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor';
+                                break;
+                            case 'learner':
+                                $ltiroles[] = 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner';
+                                break;
+                            case 'mentor':
+                                $ltiroles[] = 'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor';
+                                break;
+                            case 'teachingassistant':
+                                $ltiroles[] = 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor';
+                                $ltiroles[] = 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant';
+                                break;
+                        }
+                    }
+                }
+                $params['roles'] = implode(',', $ltiroles);
             }
             if ($tool->getSetting('sendUserUsername', 'false') === 'true') {
                 $params['ext_username'] = $user->user_login;

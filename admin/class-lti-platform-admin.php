@@ -121,10 +121,24 @@ class LTI_Platform_Admin
                     $value = sanitize_textarea_field($value);
                     break;
                 default:
-                    $value = sanitize_text_field($value);
+                    if (!is_array($value)) {
+                        $value = sanitize_text_field($value);
+                    } else {
+                        $arr = $value;
+                        $value = array();
+                        foreach ($arr as $item) {
+                            $value[] = sanitize_text_field($item);
+                        }
+                    }
                     break;
             }
             $options[$option] = $value;
+        }
+        $roles = get_editable_roles();
+        foreach (array_keys($roles) as $role) {
+            if (!isset($options["role_{$role}"])) {
+                $options["role_{$role}"] = array();
+            }
         }
         if (is_multisite()) {
             update_site_option(LTI_Platform::get_settings_name(), $options);
@@ -212,6 +226,17 @@ class LTI_Platform_Admin
             array('label_for' => 'id_senduserusername', 'name' => 'senduserusername', 'options' => $options));
 
         add_settings_section(
+            'section_roles', __('Role Mappings', LTI_Platform::get_plugin_name()), array($this, 'section_roles'),
+            LTI_Platform::get_plugin_name()
+        );
+        $roles = get_editable_roles();
+        foreach ($roles as $key => $role) {
+            add_settings_field("field_role_{$key}", __($role['name'], LTI_Platform::get_plugin_name()), array($this, 'field_role'),
+                LTI_Platform::get_plugin_name(), 'section_roles',
+                array('label_for' => "id_role_{$key}", 'name' => "role_{$key}", 'options' => $options));
+        }
+
+        add_settings_section(
             'section_presentation', __('Presentation Settings', LTI_Platform::get_plugin_name()),
             array($this, 'section_presentation'), LTI_Platform::get_plugin_name()
         );
@@ -247,6 +272,12 @@ class LTI_Platform_Admin
 
     }
 
+    public function section_roles()
+    {
+        echo '<p>' . __('Select the default LTI role(s) to be passed to a tool for each WordPress role.',
+            LTI_Platform::get_plugin_name()) . "</p>\n";
+    }
+
     public function section_presentation()
     {
 
@@ -279,6 +310,24 @@ class LTI_Platform_Admin
             echo($args['options'][$args['name']]);
         }
         echo('</textarea>' . "\n");
+    }
+
+    public function field_role($args)
+    {
+        echo('<select id="' . esc_attr($args['label_for']) . '" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . '][]" size="6" multiple>' . "\n");
+        echo('  <option value="administrator"' . selected(isset($args['options'][$args['name']]) && (in_array('administrator',
+                $args['options'][$args['name']])), true, false) . '>Administrator</option>' . "\n");
+        echo('  <option value="contentdeveloper"' . selected(isset($args['options'][$args['name']]) && (in_array('contentdeveloper',
+                $args['options'][$args['name']])), true, false) . '>Content developer</option>' . "\n");
+        echo('  <option value="instructor"' . selected(isset($args['options'][$args['name']]) && (in_array('instructor',
+                $args['options'][$args['name']])), true, false) . '>Instructor</option>' . "\n");
+        echo('  <option value="learner"' . selected(isset($args['options'][$args['name']]) && (in_array('learner',
+                $args['options'][$args['name']])), true, false) . '>Learner</option>' . "\n");
+        echo('  <option value="mentor"' . selected(isset($args['options'][$args['name']]) && (in_array('mentor',
+                $args['options'][$args['name']])), true, false) . '>Mentor</option>' . "\n");
+        echo('  <option value="teachingassistant"' . selected(isset($args['options'][$args['name']]) && (in_array('teachingassistant',
+                $args['options'][$args['name']])), true, false) . '>Teaching assistant</option>' . "\n");
+        echo('</select>' . "\n");
     }
 
     public function field_target($args)
@@ -359,6 +408,11 @@ class LTI_Platform_Admin
             (!empty($_POST['senduserrole']) && (sanitize_text_field($_POST['senduserrole'] === 'true'))) ? 'true' : null);
         $tool->setSetting('sendUserUsername',
             (!empty($_POST['senduserusername']) && (sanitize_text_field($_POST['senduserusername'] === 'true'))) ? 'true' : null);
+        $roles = get_editable_roles();
+        foreach (array_keys($roles) as $role) {
+            $tool->setSetting("role_{$role}",
+                (!empty($_POST["role_{$role}"])) ? sanitize_text_field(implode(',', $_POST["role_{$role}"])) : null);
+        }
         $tool->setSetting('presentationTarget', sanitize_text_field($_POST['presentationtarget']));
         $tool->setSetting('presentationWidth', sanitize_text_field($_POST['presentationwidth']));
         $tool->setSetting('presentationHeight', sanitize_text_field($_POST['presentationheight']));

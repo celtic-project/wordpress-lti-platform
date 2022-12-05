@@ -84,6 +84,20 @@ class LTI_Platform_Tool extends Tool
             if (!is_array(self::$options)) {
                 self::$options = array();
             }
+            require_once ABSPATH . 'wp-admin/includes/user.php';
+            $roles = get_editable_roles();
+            $defaultroles = array(
+                'administrator' => array('administrator', 'instructor'),
+                'editor' => array('instructor'),
+                'author' => array('learner'),
+                'contributor' => array('learner'),
+                'subscriber' => array('learner')
+            );
+            foreach (array_keys($roles) as $role) {
+                if (!isset(self::$options["role_{$role}"]) && isset($defaultroles[$role])) {
+                    self::$options["role_{$role}"] = $defaultroles[$role];
+                }
+            }
         }
 
         return self::$options;
@@ -114,6 +128,10 @@ class LTI_Platform_Tool extends Tool
         $this->setSetting('presentationTarget', (!empty($options['presentationtarget'])) ? $options['presentationtarget'] : '');
         $this->setSetting('presentationWidth', (!empty($options['presentationwidth'])) ? $options['presentationwidth'] : '');
         $this->setSetting('presentationHeight', (!empty($options['presentationheight'])) ? $options['presentationheight'] : '');
+        $roles = get_editable_roles();
+        foreach (array_keys($roles) as $role) {
+            $this->setSetting("role_{$role}", (isset($options["role_{$role}"])) ? implode(',', $options["role_{$role}"]) : '');
+        }
     }
 
     public function save($quiet = false)

@@ -159,6 +159,41 @@ echo('        </tr>' . "\n");
 echo('      </tbody>' . "\n");
 echo('    </table>' . "\n");
 echo('' . "\n");
+echo('    <h2>' . esc_html__('Role Mappings', LTI_Platform::get_plugin_name()) . '</h2>' . "\n");
+echo '    <p>' . __('Select the LTI role(s) to be passed to this tool for each WordPress role.', LTI_Platform::get_plugin_name()) . "</p>\n";
+echo('' . "\n");
+echo('    <table class="form-table">' . "\n");
+echo('      <tbody>' . "\n");
+$roles = get_editable_roles();
+foreach ($roles as $key => $role) {
+    $setting = explode(',', $tool->getSetting("role_{$key}", ''));
+    echo('        <tr class="form-field form-required">' . "\n");
+    echo('          <th scope="row">' . "\n");
+    echo('            <label for="id_role_' . esc_attr($key) . '">' . "\n");
+    echo('              ' . esc_html__($role['name'], LTI_Platform::get_plugin_name()) . "\n");
+    echo('            </label>' . "\n");
+    echo('          </th>' . "\n");
+    echo('          <td>' . "\n");
+    echo('            <select id="id_role_' . esc_attr($key) . '" aria-required="true" name="role_' . esc_attr($key) . '[]" size="6" multiple>' . "\n");
+    echo('              <option value="administrator"' . selected(in_array('administrator', $setting), true, false) . '>' . esc_html__('Administrator',
+        LTI_Platform::get_plugin_name()) . '</option>' . "\n");
+    echo('              <option value="contentdeveloper"' . selected(in_array('contentdeveloper', $setting), true, false) . '>' . esc_html__('Content developer',
+        LTI_Platform::get_plugin_name()) . '</option>' . "\n");
+    echo('              <option value="instructor"' . selected(in_array('instructor', $setting), true, false) . '>' . esc_html__('Instructor',
+        LTI_Platform::get_plugin_name()) . '</option>' . "\n");
+    echo('              <option value="learner"' . selected(in_array('learner', $setting), true, false) . '>' . esc_html__('Learner',
+        LTI_Platform::get_plugin_name()) . '</option>' . "\n");
+    echo('              <option value="mentor"' . selected(in_array('mentor', $setting), true, false) . '>' . esc_html__('Mentor',
+        LTI_Platform::get_plugin_name()) . '</option>' . "\n");
+    echo('              <option value="teachingassistant"' . selected(in_array('teachingassistant', $setting), true, false) . '>' . esc_html__('Teaching assistant',
+        LTI_Platform::get_plugin_name()) . '</option>' . "\n");
+    echo('            </select>' . "\n");
+    echo('          </td>' . "\n");
+    echo('        </tr>' . "\n");
+}
+echo('      </tbody>' . "\n");
+echo('    </table>' . "\n");
+echo('' . "\n");
 echo('    <h2>' . esc_html__('Presentation Settings', LTI_Platform::get_plugin_name()) . '</h2>' . "\n");
 echo('' . "\n");
 echo('    <table class="form-table">' . "\n");

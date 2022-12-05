@@ -224,6 +224,7 @@ class DataConnector_wp extends DataConnector\DataConnector
         if (!is_array($settings)) {
             $settings = array();
         }
+        $settings = array_merge($tool->getSettings(), $settings);
         $tool->setSettings($settings);
         $this->fixToolSettings($tool, false);
     }
