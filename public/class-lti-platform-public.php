@@ -66,24 +66,36 @@ class LTI_Platform_Public
         $this->version = $version;
     }
 
+    public function enqueue_scripts($hook)
+    {
+        $options = LTI_Platform_Tool::getOptions();
+        if (!empty($options['storage'])) {
+            wp_enqueue_script("{$this->plugin_name}-storagejs",
+                get_option('siteurl') . '/?' . LTI_Platform::get_plugin_name() . '&storagejs', array(), $this->version, false);
+        }
+    }
+
     public function parse_request()
     {
         if (isset($_GET[LTI_Platform::get_plugin_name()])) {
             if (isset($_GET['tools'])) {
-                header('Content-type: text/html');
+                header('Content-type: text/html; charset=UTF-8');
                 $allowed = array('div' => array('class' => true), 'h2' => array(), 'p' => array(), 'br' => array(), 'input' => array('type' => true, 'name' => true, 'class' => true, 'value' => true, 'toolname' => true), 'button' => array('class' => true, 'id' => true, 'disabled' => true));
                 echo(wp_kses($this->get_tools_list(), $allowed));
             } else if (isset($_GET['usecontentitem'])) {
-                header('Content-type: application/json');
+                header('Content-type: application/json; charset=UTF-8');
                 echo(json_encode($this->get_tool(sanitize_text_field($_GET['tool']))));
             } else if (isset($_GET['keys'])) {
                 $jwt = LTI\Jwt\Jwt::getJwtClient();
                 $options = LTI_Platform_Tool::getOptions();
                 $keys = $jwt::getJWKS($options['privatekey'], 'RS256', $options['kid']);
-                header('Content-type: application/json');
+                header('Content-type: application/json; charset=UTF-8');
                 echo(json_encode($keys));
             } else if (isset($_GET['auth'])) {
                 $this->handleRequest();
+            } else if (isset($_GET['storagejs'])) {
+                header('Content-Type: text/javascript; charset=UTF-8');
+                echo LTI\Platform::getStorageJS();
             } else if (isset($_GET['embed'])) {
                 $this->renderTool();
             } else if (isset($_GET['content'])) {
@@ -462,6 +474,9 @@ class LTI_Platform_Public
         } else {
             $platform->ltiVersion = LTI\Util::LTI_VERSION1P3;
             $platform->signatureMethod = 'RS256';
+            if (!empty($options['storage'])) {
+                $platform::$browserStorageFrame = '_parent';
+            }
         }
 
         return $platform;

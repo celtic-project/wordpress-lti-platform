@@ -70,10 +70,10 @@ class LTI_Platform_Admin
     {
         if (($hook === 'post-new.php') || ($hook === 'post.php')) {
             wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/lti-platform-post.css', array(), $this->version);
-            wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/lti-platform-post.js',
+            wp_enqueue_script("{$this->plugin_name}-post", plugin_dir_url(__FILE__) . 'js/lti-platform-post.js',
                 array('wp-element', 'wp-editor', 'wp-rich-text'), $this->version, false);
         } elseif (($hook === "settings_page_{$this->plugin_name}-settings") || ($hook === "settings_page_{$this->plugin_name}-edit")) {
-            wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/lti-platform-settings.js');
+            wp_enqueue_script("{$this->plugin_name}-settings", plugin_dir_url(__FILE__) . 'js/lti-platform-settings.js');
         }
     }
 
@@ -260,6 +260,9 @@ class LTI_Platform_Admin
         add_settings_field('field_privatekey', __('Private key', LTI_Platform::get_plugin_name()), array($this, 'field_textarea'),
             LTI_Platform::get_plugin_name(), 'section_security',
             array('label_for' => 'id_privatekey', 'name' => 'privatekey', 'rows' => '10', 'cols' => '65', 'options' => $options));
+        add_settings_field('field_storage', __('Offer platform storage to tools?', LTI_Platform::get_plugin_name()),
+            array($this, 'field_checkbox'), LTI_Platform::get_plugin_name(), 'section_security',
+            array('label_for' => 'id_storage', 'name' => 'storage', 'options' => $options));
     }
 
     public function section_general()

@@ -223,6 +223,8 @@ class LTI_Platform
         $plugin_public = new LTI_Platform_Public(self::get_plugin_name(), $this->get_version());
 
         $this->loader->add_action('parse_request', $plugin_public, 'parse_request');
+
+        $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
     }
 
     /**
