@@ -388,7 +388,7 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
     public function column_name($item)
     {
         if (in_array($item->code, $this->mu_items)) {
-            return sprintf('<span style="text-decoration: line-through;" title="Network LTI tool exists with same code">%1$s</span>',
+            return sprintf('<span style="text-decoration: line-through;" title="A network LTI tool exists with same code">%1$s</span>',
                 esc_html($item->name));
         } else {
             return sprintf('<strong>%1$s</strong>', esc_html($item->name));
@@ -480,10 +480,13 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
 
     public function column_code($item)
     {
-        if (!$item->deleted) {
-            return esc_html($item->code);
-        } else {
+        if ($item->deleted) {
             return esc_html(str_replace('__trashed', '', $item->code));
+        } elseif (in_array($item->code, $this->mu_items)) {
+            return sprintf('<span style="text-decoration: line-through;" title="A network LTI tool exists with same code">%1$s</span>',
+                esc_html($item->code));
+        } else {
+            return esc_html($item->code);
         }
     }
 
