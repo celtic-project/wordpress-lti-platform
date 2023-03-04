@@ -79,35 +79,34 @@ class LTI_Platform_Admin
 
     public function options_page()
     {
-        $menu = add_options_page('LTI Tools', 'LTI Tools', 'manage_options', LTI_Platform::get_plugin_name(),
-            array($this, 'view_page_html'));
+        $menu = add_options_page('LTI Tools', 'LTI Tools', 'manage_options', $this->plugin_name, array($this, 'view_page_html'));
         add_action("load-{$menu}", array($this, 'load_tools_table'));
 
-        $submenu = add_submenu_page(null, 'Add LTI Tool', 'Add New', 'manage_options', LTI_Platform::get_plugin_name() . '-edit',
+        $submenu = add_submenu_page(null, 'Add LTI Tool', 'Add New', 'manage_options', "{$this->plugin_name}-edit",
             array($this, 'edit_page_html'));
         add_action("load-{$submenu}", array($this, 'load_submenu'));
 
-        $submenu = add_submenu_page(null, 'LTI Platform Settings', 'Settings', 'manage_options',
-            LTI_Platform::get_plugin_name() . '-settings', array($this, 'options_page_html')
+        $submenu = add_submenu_page(null, 'LTI Platform Settings', 'Settings', 'manage_options', "{$this->plugin_name}-settings",
+            array($this, 'options_page_html')
         );
         add_action("load-{$submenu}", array($this, 'load_submenu'));
     }
 
     public function network_options_page()
     {
-        $menu = add_submenu_page('settings.php', 'Network LTI Tools', 'Network LTI Tools', 'manage_options',
-            LTI_Platform::get_plugin_name(), array($this, 'view_page_html'));
+        $menu = add_submenu_page('settings.php', 'Network LTI Tools', 'Network LTI Tools', 'manage_options', $this->plugin_name,
+            array($this, 'view_page_html'));
         add_action("load-{$menu}", array($this, 'load_tools_table'));
 
-        $submenu = add_submenu_page(null, 'Add Network LTI Tool', 'Add New', 'manage_options',
-            LTI_Platform::get_plugin_name() . '-edit', array($this, 'edit_page_html'));
+        $submenu = add_submenu_page(null, 'Add Network LTI Tool', 'Add New', 'manage_options', "{$this->plugin_name}-edit",
+            array($this, 'edit_page_html'));
         add_action("load-{$submenu}", array($this, 'load_submenu'));
 
         $submenu = add_submenu_page(null, 'Network LTI Platform Settings', 'Network Settings', 'manage_options',
-            LTI_Platform::get_plugin_name() . '-settings', array($this, 'options_page_html')
+            "{$this->plugin_name}-settings", array($this, 'options_page_html')
         );
         add_action("load-{$submenu}", array($this, 'load_submenu'));
-        add_action('network_admin_edit_' . LTI_Platform::get_plugin_name() . '-settings', array($this, 'save_network_options'));
+        add_action("network_admin_edit_{$this->plugin_name}-settings", array($this, 'save_network_options'));
     }
 
     public function save_network_options()
@@ -146,14 +145,14 @@ class LTI_Platform_Admin
             update_option(LTI_Platform::get_settings_name(), $options);
         }
         add_action('all_admin_notices', 'save_network_notice_success');
-        wp_redirect('settings.php?page=' . LTI_Platform::get_plugin_name() . '-settings');
+        wp_redirect("settings.php?page={$this->plugin_name}-settings");
         exit;
     }
 
     public function save_network_notice_success()
     {
         echo('    <div class="notice notice-success is-dismissible">' . "\n");
-        echo('        <p>' . esc_html__('Settings updated.', LTI_Platform::get_plugin_name()) . '</p>' . "\n");
+        echo('        <p>' . esc_html__('Settings updated.', $this->plugin_name) . '</p>' . "\n");
         echo('    </div>' . "\n");
     }
 
@@ -162,12 +161,12 @@ class LTI_Platform_Admin
         $screen = get_current_screen();
         add_filter("manage_{$screen->id}_columns", array('LTI_Platform_Tool_List_Table', 'define_columns'), 10, 0);
         add_screen_option('per_page',
-            array('label' => __('Tools', LTI_Platform::get_plugin_name()), 'default' => 5, 'option' => LTI_Platform::get_plugin_name() . '-tool_per_page'));
+            array('label' => __('Tools', $this->plugin_name), 'default' => 5, 'option' => "{$this->plugin_name}-tool_per_page"));
         $screen->add_help_tab(array(
-            'id' => LTI_Platform::get_plugin_name() . '-display',
-            'title' => __('Screen Display', LTI_Platform::get_plugin_name()),
+            'id' => "{$this->plugin_name}-display",
+            'title' => __('Screen Display', $this->plugin_name),
             'content' => '<p>' . __('You can select which columns to display and the number of LTI Tools to list per screen using the Screen Options tab.',
-                LTI_Platform::get_plugin_name()) . '</p>'
+                $this->plugin_name) . '</p>'
         ));
     }
 
@@ -180,7 +179,7 @@ class LTI_Platform_Admin
     {
 // Ensure plugin remains highlighted as current in menu
         if ((($parent_file === 'options-general.php') || ($parent_file === 'settings.php')) && empty($submenu_file)) {
-            $submenu_file = LTI_Platform::get_plugin_name();
+            $submenu_file = $this->plugin_name;
         }
 
         return $submenu_file;
@@ -188,80 +187,74 @@ class LTI_Platform_Admin
 
     public function settings_init()
     {
-        register_setting(LTI_Platform::get_plugin_name(), LTI_Platform::get_settings_name());
+        register_setting($this->plugin_name, LTI_Platform::get_settings_name());
         $options = LTI_Platform_Tool::getOptions();
 
         add_settings_section(
-            'section_general', __('General Settings', LTI_Platform::get_plugin_name()), array($this, 'section_general'),
-            LTI_Platform::get_plugin_name()
+            'section_general', __('General Settings', $this->plugin_name), array($this, 'section_general'), $this->plugin_name
         );
-        add_settings_field('field_debug', __('Debug mode?', LTI_Platform::get_plugin_name()), array($this, 'field_checkbox'),
-            LTI_Platform::get_plugin_name(), 'section_general',
-            array('label_for' => 'id_debug', 'name' => 'debug', 'options' => $options));
-        add_settings_field('field_uninstall', __('Delete data on uninstall?', LTI_Platform::get_plugin_name()),
-            array($this, 'field_checkbox'), LTI_Platform::get_plugin_name(), 'section_general',
+        add_settings_field('field_debug', __('Debug mode?', $this->plugin_name), array($this, 'field_checkbox'), $this->plugin_name,
+            'section_general', array('label_for' => 'id_debug', 'name' => 'debug', 'options' => $options));
+        add_settings_field('field_uninstall', __('Delete data on uninstall?', $this->plugin_name), array($this, 'field_checkbox'),
+            $this->plugin_name, 'section_general',
             array('label_for' => 'id_uninstall', 'name' => 'uninstall', 'options' => $options));
-        add_settings_field('field_platformguid', __('Platform GUID', LTI_Platform::get_plugin_name()), array($this, 'field_text'),
-            LTI_Platform::get_plugin_name(), 'section_general',
+        add_settings_field('field_platformguid', __('Platform GUID', $this->plugin_name), array($this, 'field_text'),
+            $this->plugin_name, 'section_general',
             array('label_for' => 'id_platformguid', 'name' => 'platformguid', 'options' => $options));
 
         add_settings_section(
-            'section_privacy', __('Privacy Settings', LTI_Platform::get_plugin_name()), array($this, 'section_privacy'),
-            LTI_Platform::get_plugin_name()
+            'section_privacy', __('Privacy Settings', $this->plugin_name), array($this, 'section_privacy'), $this->plugin_name
         );
-        add_settings_field('field_name', __('Send user\'s name?', LTI_Platform::get_plugin_name()), array($this, 'field_checkbox'),
-            LTI_Platform::get_plugin_name(), 'section_privacy',
+        add_settings_field('field_name', __('Send user\'s name?', $this->plugin_name), array($this, 'field_checkbox'),
+            $this->plugin_name, 'section_privacy',
             array('label_for' => 'id_sendusername', 'name' => 'sendusername', 'options' => $options));
-        add_settings_field('field_id', __('Send user\'s ID?', LTI_Platform::get_plugin_name()), array($this, 'field_checkbox'),
-            LTI_Platform::get_plugin_name(), 'section_privacy',
+        add_settings_field('field_id', __('Send user\'s ID?', $this->plugin_name), array($this, 'field_checkbox'),
+            $this->plugin_name, 'section_privacy',
             array('label_for' => 'id_senduserid', 'name' => 'senduserid', 'options' => $options));
-        add_settings_field('field_email', __('Send user\'s email?', LTI_Platform::get_plugin_name()),
-            array($this, 'field_checkbox'), LTI_Platform::get_plugin_name(), 'section_privacy',
+        add_settings_field('field_email', __('Send user\'s email?', $this->plugin_name), array($this, 'field_checkbox'),
+            $this->plugin_name, 'section_privacy',
             array('label_for' => 'id_senduseremail', 'name' => 'senduseremail', 'options' => $options));
-        add_settings_field('field_role', __('Send user\'s role?', LTI_Platform::get_plugin_name()), array($this, 'field_checkbox'),
-            LTI_Platform::get_plugin_name(), 'section_privacy',
+        add_settings_field('field_role', __('Send user\'s role?', $this->plugin_name), array($this, 'field_checkbox'),
+            $this->plugin_name, 'section_privacy',
             array('label_for' => 'id_senduserrole', 'name' => 'senduserrole', 'options' => $options));
-        add_settings_field('field_username', __('Send user\'s username?', LTI_Platform::get_plugin_name()),
-            array($this, 'field_checkbox'), LTI_Platform::get_plugin_name(), 'section_privacy',
+        add_settings_field('field_username', __('Send user\'s username?', $this->plugin_name), array($this, 'field_checkbox'),
+            $this->plugin_name, 'section_privacy',
             array('label_for' => 'id_senduserusername', 'name' => 'senduserusername', 'options' => $options));
 
         add_settings_section(
-            'section_roles', __('Role Mappings', LTI_Platform::get_plugin_name()), array($this, 'section_roles'),
-            LTI_Platform::get_plugin_name()
+            'section_roles', __('Role Mappings', $this->plugin_name), array($this, 'section_roles'), $this->plugin_name
         );
         $roles = get_editable_roles();
         foreach ($roles as $key => $role) {
-            add_settings_field("field_role_{$key}", __($role['name'], LTI_Platform::get_plugin_name()), array($this, 'field_role'),
-                LTI_Platform::get_plugin_name(), 'section_roles',
+            add_settings_field("field_role_{$key}", __($role['name'], $this->plugin_name), array($this, 'field_role'),
+                $this->plugin_name, 'section_roles',
                 array('label_for' => "id_role_{$key}", 'name' => "role_{$key}", 'options' => $options));
         }
 
         add_settings_section(
-            'section_presentation', __('Presentation Settings', LTI_Platform::get_plugin_name()),
-            array($this, 'section_presentation'), LTI_Platform::get_plugin_name()
+            'section_presentation', __('Presentation Settings', $this->plugin_name), array($this, 'section_presentation'),
+            $this->plugin_name
         );
-        add_settings_field('field_target', __('Presentation target', LTI_Platform::get_plugin_name()), array($this, 'field_target'),
-            LTI_Platform::get_plugin_name(), 'section_presentation',
+        add_settings_field('field_target', __('Presentation target', $this->plugin_name), array($this, 'field_target'),
+            $this->plugin_name, 'section_presentation',
             array('label_for' => 'id_presentationtarget', 'name' => 'presentationtarget', 'options' => $options));
-        add_settings_field('field_width', __('Width of pop-up window or iframe', LTI_Platform::get_plugin_name()),
-            array($this, 'field_text'), LTI_Platform::get_plugin_name(), 'section_presentation',
+        add_settings_field('field_width', __('Width of pop-up window or iframe', $this->plugin_name), array($this, 'field_text'),
+            $this->plugin_name, 'section_presentation',
             array('label_for' => 'id_presentationwidth', 'name' => 'presentationwidth', 'options' => $options));
-        add_settings_field('field_height', __('Height of pop-up window or iframe', LTI_Platform::get_plugin_name()),
-            array($this, 'field_text'), LTI_Platform::get_plugin_name(), 'section_presentation',
+        add_settings_field('field_height', __('Height of pop-up window or iframe', $this->plugin_name), array($this, 'field_text'),
+            $this->plugin_name, 'section_presentation',
             array('label_for' => 'id_presentationheight', 'name' => 'presentationheight', 'options' => $options));
 
         add_settings_section(
-            'section_security', __('Security Settings', LTI_Platform::get_plugin_name()), array($this, 'section_security'),
-            LTI_Platform::get_plugin_name()
+            'section_security', __('Security Settings', $this->plugin_name), array($this, 'section_security'), $this->plugin_name
         );
-        add_settings_field('field_kid', __('Key ID', LTI_Platform::get_plugin_name()), array($this, 'field_text'),
-            LTI_Platform::get_plugin_name(), 'section_security',
-            array('label_for' => 'id_kid', 'name' => 'kid', 'options' => $options));
-        add_settings_field('field_privatekey', __('Private key', LTI_Platform::get_plugin_name()), array($this, 'field_textarea'),
-            LTI_Platform::get_plugin_name(), 'section_security',
+        add_settings_field('field_kid', __('Key ID', $this->plugin_name), array($this, 'field_text'), $this->plugin_name,
+            'section_security', array('label_for' => 'id_kid', 'name' => 'kid', 'options' => $options));
+        add_settings_field('field_privatekey', __('Private key', $this->plugin_name), array($this, 'field_textarea'),
+            $this->plugin_name, 'section_security',
             array('label_for' => 'id_privatekey', 'name' => 'privatekey', 'rows' => '10', 'cols' => '65', 'options' => $options));
-        add_settings_field('field_storage', __('Offer platform storage to tools?', LTI_Platform::get_plugin_name()),
-            array($this, 'field_checkbox'), LTI_Platform::get_plugin_name(), 'section_security',
+        add_settings_field('field_storage', __('Offer platform storage to tools?', $this->plugin_name),
+            array($this, 'field_checkbox'), $this->plugin_name, 'section_security',
             array('label_for' => 'id_storage', 'name' => 'storage', 'options' => $options));
     }
 
@@ -277,8 +270,7 @@ class LTI_Platform_Admin
 
     public function section_roles()
     {
-        echo '<p>' . __('Select the default LTI role(s) to be passed to a tool for each WordPress role.',
-            LTI_Platform::get_plugin_name()) . "</p>\n";
+        echo '<p>' . __('Select the default LTI role(s) to be passed to a tool for each WordPress role.', $this->plugin_name) . "</p>\n";
     }
 
     public function section_presentation()
@@ -353,7 +345,7 @@ class LTI_Platform_Admin
             return;
         }
 
-        settings_errors(LTI_Platform::get_plugin_name() . '_messages');
+        settings_errors("{$this->plugin_name}_messages");
 
         require_once(plugin_dir_path(dirname(__FILE__)) . 'admin/partials/lti-platform-admin-settings.php');
     }
@@ -378,7 +370,7 @@ class LTI_Platform_Admin
                     LTI_Platform::$ltiPlatformDataConnector);
         }
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!isset($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce'], LTI_Platform::get_plugin_name() . '-nonce')) {
+            if (!isset($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce'], "{$this->plugin_name}-nonce")) {
                 add_action('all_admin_notices', array($this, 'error_update'));
             } else {
                 $this->update_tool($tool);
@@ -387,11 +379,11 @@ class LTI_Platform_Admin
         require_once plugin_dir_path(dirname(__FILE__)) . 'admin/partials/lti-platform-admin-edit.php';
     }
 
-    function error_update()
+    public function error_update()
     {
         $allowed = array('em' => array());
         echo('  <div class="notice notice-error">' . "\n");
-        echo('    <p>' . esc_html__('Unable to save the changes.', LTI_Platform::get_plugin_name()) . '</p>' . "\n");
+        echo('    <p>' . esc_html__('Unable to save the changes.', $this->plugin_name) . '</p>' . "\n");
         echo('  </div>' . "\n");
     }
 
