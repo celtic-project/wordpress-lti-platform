@@ -209,6 +209,13 @@ class LTI_Platform
         $this->loader->add_action('init', 'LTI_Platform_Tool', 'register');
 
         $this->loader->add_filter('posts_orderby', 'LTI_Platform_Tool_List_Table', 'tools_orderby', 10, 2);
+
+        $prefix = '';
+        if (is_multisite()) {
+            $prefix = 'network_admin_';
+        }
+        $this->loader->add_filter("{$prefix}plugin_action_links_" . self::get_plugin_name() . '/' . self::get_plugin_name() . '.php',
+            $plugin_admin, 'plugin_settings_link');
     }
 
     /**

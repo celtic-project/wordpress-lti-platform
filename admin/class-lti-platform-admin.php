@@ -77,6 +77,21 @@ class LTI_Platform_Admin
         }
     }
 
+    public function plugin_settings_link($links)
+    {
+        if (is_multisite()) {
+            $page = 'settings.php';
+        } else {
+            $page = 'options-general.php';
+        }
+        $url = add_query_arg(array('page' => "{$this->plugin_name}-settings"), $page);
+        array_unshift($links,
+            sprintf('<a href="%1$s" title="%2$s">%3$s</a>', esc_url($url), esc_html__('Change plugin settings', $this->plugin_name),
+                esc_html__('Settings', $this->plugin_name)));
+
+        return $links;
+    }
+
     public function options_page()
     {
         $menu = add_options_page('LTI Tools', 'LTI Tools', 'manage_options', $this->plugin_name, array($this, 'view_page_html'));
