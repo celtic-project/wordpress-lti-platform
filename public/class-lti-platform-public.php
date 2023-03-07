@@ -393,7 +393,8 @@ class LTI_Platform_Public
             }
             $custom = array();
             if (!empty($link_atts['custom'])) {
-                parse_str(str_replace(';', '&', $link_atts['custom']), $custom);
+                $decoded = html_entity_decode($link_atts['custom']);
+                parse_str(str_replace(';', '&', $decoded), $custom);
                 foreach ($custom as $name => $value) {
                     $name = preg_replace('/[^a-z0-9]/', '_', strtolower(trim($name)));
                     if (!empty($name)) {
