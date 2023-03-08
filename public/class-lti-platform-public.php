@@ -396,18 +396,24 @@ class LTI_Platform_Public
                 $decoded = html_entity_decode($link_atts['custom']);
                 parse_str(str_replace(';', '&', $decoded), $custom);
                 foreach ($custom as $name => $value) {
-                    $name = preg_replace('/[^a-z0-9]/', '_', strtolower(trim($name)));
-                    if (!empty($name)) {
-                        $params["custom_{$name}"] = $value;
+                    $lcname = preg_replace('/[^a-z0-9]/', '_', strtolower(trim($name)));
+                    if (!empty($lcname)) {
+                        $params["custom_{$lcname}"] = $value;
+                        if (($platform->ltiVersion === LTI\Util::LTI_VERSION1P3) && ($name !== $lcname)) {
+                            $params["custom_{$name}"] = $value;
+                        }
                     }
                 }
             }
             if (!empty($tool->getSetting('custom'))) {
                 parse_str(str_replace('&#13;&#10;', '&', $tool->getSetting('custom')), $custom);
                 foreach ($custom as $name => $value) {
-                    $name = preg_replace('/[^a-z0-9]/', '_', strtolower(trim($name)));
-                    if (!empty($name)) {
-                        $params["custom_{$name}"] = $value;
+                    $lcname = preg_replace('/[^a-z0-9]/', '_', strtolower(trim($name)));
+                    if (!empty($lcname)) {
+                        $params["custom_{$lcname}"] = $value;
+                        if (($platform->ltiVersion === LTI\Util::LTI_VERSION1P3) && ($name !== $lcname)) {
+                            $params["custom_{$name}"] = $value;
+                        }
                     }
                 }
             }
