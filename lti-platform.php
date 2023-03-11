@@ -2,7 +2,7 @@
 /*
  *  wordpress-lti-platform - Enable WordPress to act as an LTI Platform.
 
- *  Copyright (C) 2022  Stephen P Vickers
+ *  Copyright (C) 2023  Stephen P Vickers
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
