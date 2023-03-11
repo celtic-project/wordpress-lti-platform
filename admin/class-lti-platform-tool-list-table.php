@@ -33,9 +33,31 @@
 class LTI_Platform_Tool_List_Table extends WP_List_Table
 {
 
+    /**
+     * The codes of any tools defined at the network level.
+     *
+     * @since    1.0.0
+     * @access   private
+     * @var      array    $mu_items    Array of tool codes.
+     */
     private $mu_items = array();
+
+    /**
+     * Whether a list of deleted tools has been requested.
+     *
+     * @since    1.0.0
+     * @access   private
+     * @var      bool    $is_trash    True if the list is of deleted tools.
+     */
     private $is_trash;
 
+    /**
+     * Initialize the class and set its properties.
+     *
+     * @since    1.0.0
+     * @param    string    $plugin_name       The name of this plugin.
+     * @param    string    $version    The version of this plugin.
+     */
     public function __construct()
     {
         parent::__construct(array(
@@ -53,11 +75,23 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         }
     }
 
+    /**
+     * Get the name of the primary column.
+     *
+     * @since    1.0.0
+     * @return   string    Name of primary column.
+     */
     public static function set_primary_column()
     {
         return 'name';
     }
 
+    /**
+     * Get the details for the table columns.
+     *
+     * @since    1.0.0
+     * @return   array    Array of column details.
+     */
     public static function define_columns()
     {
         $columns = array(
@@ -74,6 +108,12 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         return $columns;
     }
 
+    /**
+     * Get the SQL for ordering values in a column.
+     *
+     * @since    1.0.0
+     * @return   string    SQL for ORDER BY clause.
+     */
     public static function tools_orderby($args, $wp_query)
     {
         global $wpdb;
@@ -93,6 +133,11 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         return $args;
     }
 
+    /**
+     * Display a message when a tool has been successfully moved to the trash bin.
+     *
+     * @since    1.0.0
+     */
     public function trash_notice_success()
     {
         echo('    <div class="notice notice-success is-dismissible">' . "\n");
@@ -100,6 +145,11 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         echo('    </div>' . "\n");
     }
 
+    /**
+     * Display a message when moving a tool to the trash bin has not been successful.
+     *
+     * @since    1.0.0
+     */
     public function trash_notice_error()
     {
         echo('    <div class="notice notice-error is-dismissible">' . "\n");
@@ -107,6 +157,11 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         echo('    </div>' . "\n");
     }
 
+    /**
+     * Display a message when a tool has been successfully deleted.
+     *
+     * @since    1.0.0
+     */
     public function delete_notice_success()
     {
         echo('    <div class="notice notice-success is-dismissible">' . "\n");
@@ -114,6 +169,11 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         echo('    </div>' . "\n");
     }
 
+    /**
+     * Display a message when a tool deletion has not been successful.
+     *
+     * @since    1.0.0
+     */
     public function delete_notice_error()
     {
         echo('    <div class="notice notice-error is-dismissible">' . "\n");
@@ -121,6 +181,11 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         echo('    </div>' . "\n");
     }
 
+    /**
+     * Display a message when a tool has been successfully restored from the trash bin.
+     *
+     * @since    1.0.0
+     */
     public function restore_notice_success()
     {
         echo('    <div class="notice notice-success is-dismissible">' . "\n");
@@ -128,6 +193,11 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         echo('    </div>' . "\n");
     }
 
+    /**
+     * Display a message when restoring a tool from the trash bin has not been successful.
+     *
+     * @since    1.0.0
+     */
     public function restore_notice_error()
     {
         echo('    <div class="notice notice-error is-dismissible">' . "\n");
@@ -135,6 +205,11 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         echo('    </div>' . "\n");
     }
 
+    /**
+     * Display a message when a tool has been successfully enabled.
+     *
+     * @since    1.0.0
+     */
     public function enable_notice_success()
     {
         echo('    <div class="notice notice-success is-dismissible">' . "\n");
@@ -142,6 +217,11 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         echo('    </div>' . "\n");
     }
 
+    /**
+     * Display a message when a tool cannot be enabled.
+     *
+     * @since    1.0.0
+     */
     public function enable_notice_denied()
     {
         echo('    <div class="notice notice-warning is-dismissible">' . "\n");
@@ -150,6 +230,11 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         echo('    </div>' . "\n");
     }
 
+    /**
+     * Display a message when enabling a tool is not successful.
+     *
+     * @since    1.0.0
+     */
     public function enable_notice_error()
     {
         echo('    <div class="notice notice-error is-dismissible">' . "\n");
@@ -157,6 +242,11 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         echo('    </div>' . "\n");
     }
 
+    /**
+     * Display a message when a tool has been successfully disabled.
+     *
+     * @since    1.0.0
+     */
     public function disable_notice_success()
     {
         echo('    <div class="notice notice-success is-dismissible">' . "\n");
@@ -164,6 +254,11 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         echo('    </div>' . "\n");
     }
 
+    /**
+     * Display a message when disabling a tool is not successful.
+     *
+     * @since    1.0.0
+     */
     public function disable_notice_error()
     {
         echo('    <div class="notice notice-error is-dismissible">' . "\n");
@@ -171,6 +266,11 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         echo('    </div>' . "\n");
     }
 
+    /**
+     * Process a form action request.
+     *
+     * @since    1.0.0
+     */
     public function process_action()
     {
         if (!empty($_REQUEST['tool'])) {
@@ -243,6 +343,11 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         }
     }
 
+    /**
+     * Prepare the table for display.
+     *
+     * @since    1.0.0
+     */
     public function prepare_items()
     {
         if (!isset($_REQUEST['_wpnonce']) || wp_verify_nonce($_REQUEST['_wpnonce'], LTI_Platform::get_plugin_name() . '-nonce')) {
@@ -308,6 +413,12 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         }
     }
 
+    /**
+     * Get the views available for the table.
+     *
+     * @since    1.0.0
+     * @return   array     Array of view details.
+     */
     protected function get_views()
     {
         $views = array();
@@ -335,11 +446,23 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         return $views;
     }
 
+    /**
+     * Get the columns available for the table.
+     *
+     * @since    1.0.0
+     * @return   array     Array of column details.
+     */
     public function get_columns()
     {
         return get_column_headers(get_current_screen());
     }
 
+    /**
+     * Get the sortable status for the table =columns.
+     *
+     * @since    1.0.0
+     * @return   array     Array of sortable column details.
+     */
     protected function get_sortable_columns()
     {
         $columns = array(
@@ -355,11 +478,23 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         return $columns;
     }
 
+    /**
+     * Get the default column display.
+     *
+     * @since    1.0.0
+     * @return   string    Default column value.
+     */
     protected function column_default($item, $column_name)
     {
         return '';
     }
 
+    /**
+     * Get the bulk actions available for a table row.
+     *
+     * @since    1.0.0
+     * @return   array     Array of view actions.
+     */
     protected function get_bulk_actions()
     {
         if (!$this->is_trash) {
@@ -378,6 +513,12 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         return $actions;
     }
 
+    /**
+     * Get the HTML for a checkbox column.
+     *
+     * @since    1.0.0
+     * @return   string    HTML for checkbox column.
+     */
     public function column_cb($item)
     {
         return sprintf(
@@ -385,6 +526,12 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         );
     }
 
+    /**
+     * Get the HTML for the tool name column.
+     *
+     * @since    1.0.0
+     * @return   string    HTML for name column.
+     */
     public function column_name($item)
     {
         if (in_array($item->code, $this->mu_items)) {
@@ -395,6 +542,12 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         }
     }
 
+    /**
+     * Get the HTML for the bulk actions.
+     *
+     * @since    1.0.0
+     * @return   string    HTML for row actions.
+     */
     protected function handle_row_actions($item, $column_name, $primary)
     {
         if ($column_name !== $primary) {
@@ -456,6 +609,12 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         return $this->row_actions($actions);
     }
 
+    /**
+     * Get the HTML for the tool enabled column.
+     *
+     * @since    1.0.0
+     * @return   string    HTML for enabled column.
+     */
     public function column_enabled($item)
     {
         $post = get_post($item->getRecordId());
@@ -467,6 +626,12 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         return esc_html__($item->enabled ? 'Yes' : 'No', LTI_Platform::get_plugin_name());
     }
 
+    /**
+     * Get the HTML for the tool debug mode column.
+     *
+     * @since    1.0.0
+     * @return   string    HTML for debug mode column.
+     */
     public function column_debugMode($item)
     {
         $post = get_post($item->getRecordId());
@@ -478,6 +643,12 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         return esc_html__($item->debugMode ? 'Yes' : 'No', LTI_Platform::get_plugin_name());
     }
 
+    /**
+     * Get the HTML for the tool code column.
+     *
+     * @since    1.0.0
+     * @return   string    HTML for code column.
+     */
     public function column_code($item)
     {
         if ($item->deleted) {
@@ -490,6 +661,12 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         }
     }
 
+    /**
+     * Get the HTML for the tool last accessed column.
+     *
+     * @since    1.0.0
+     * @return   string    HTML for last access column.
+     */
     public function column_lastAccess($item)
     {
         if ($item->lastAccess) {
@@ -501,6 +678,12 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         return esc_html($last_access);
     }
 
+    /**
+     * Get the HTML for the tool created column.
+     *
+     * @since    1.0.0
+     * @return   string    HTML for created column.
+     */
     public function column_created($item)
     {
         if (empty($item->created)) {
@@ -510,6 +693,12 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         }
     }
 
+    /**
+     * Get the HTML for the tool last modified column.
+     *
+     * @since    1.0.0
+     * @return   string    HTML for last modified column.
+     */
     public function column_modified($item)
     {
         if (empty($item->updated)) {
@@ -519,6 +708,12 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         }
     }
 
+    /**
+     * Get the HTML to display when the table is empty.
+     *
+     * @since    1.0.0
+     * @return   string    HTML for empty table.
+     */
     public function no_items()
     {
         if (defined('WP_NETWORK_ADMIN') && WP_NETWORK_ADMIN) {
@@ -528,6 +723,12 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         }
     }
 
+    /**
+     * Get the HTML for a tool action link.
+     *
+     * @since    1.0.0
+     * @return   string    HTML for action link.
+     */
     private function get_edit_link($args, $label, $class = '')
     {
         if (defined('WP_NETWORK_ADMIN') && WP_NETWORK_ADMIN) {

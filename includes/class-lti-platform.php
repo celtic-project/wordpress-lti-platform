@@ -77,6 +77,14 @@ class LTI_Platform
      * @var      DataConnector_wp    $ltiPlatformDataConnector    The LTI data connector.
      */
     public static $ltiPlatformDataConnector;
+
+    /**
+     * Whether the object has been successfully instantiated.
+     *
+     * @since    2.0.0
+     * @access   private
+     * @var      bool    $ok    True when the object has been successfully instantiated.
+     */
     private $ok = true;
 
     /**
@@ -110,6 +118,11 @@ class LTI_Platform
         }
     }
 
+    /**
+     * Get the status of the object.
+     *
+     * @since    1.0.0
+     */
     public function isOK()
     {
         return $this->ok;
@@ -270,6 +283,11 @@ class LTI_Platform
         return $this->version;
     }
 
+    /**
+     * Display a message when the plugin has to be deactivated.
+     *
+     * @since    1.0.0
+     */
     public function error_deactivate()
     {
         $allowed = array('em' => array());
@@ -313,6 +331,12 @@ class LTI_Platform
         return class_exists('ceLTIc\LTI\Platform');
     }
 
+    /**
+     * Check that the plugin dependencies are available.
+     *
+     * @since     2.0.1
+     * @return    bool    True if the library is found.
+     */
     private function check_dependencies()
     {
         $ok = $this->check_lti_library();

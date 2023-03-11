@@ -39,6 +39,11 @@ require_once('includes/class-lti-platform.php');
 
 global $wpdb;
 
+/**
+ * Delete all defined LTI tools of the specified type.
+ *
+ * @since     1.0.0
+ */
 function lti_platform_delete_tools($post_type)
 {
     $tools = get_posts(array(

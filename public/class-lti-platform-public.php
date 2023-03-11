@@ -66,7 +66,12 @@ class LTI_Platform_Public
         $this->version = $version;
     }
 
-    public function enqueue_scripts($hook)
+    /**
+     * Set CSS and scripts to be loaded.
+     *
+     * @since    1.0.0
+     */
+    public function enqueue_scripts()
     {
         $options = LTI_Platform_Tool::getOptions();
         if (!empty($options['storage'])) {
@@ -75,6 +80,11 @@ class LTI_Platform_Public
         }
     }
 
+    /**
+     * Process a URL for this plugin.
+     *
+     * @since    1.0.0
+     */
     public function parse_request()
     {
         if (isset($_GET[LTI_Platform::get_plugin_name()])) {
@@ -109,6 +119,11 @@ class LTI_Platform_Public
         }
     }
 
+    /**
+     * Handle an incoming LTI message.
+     *
+     * @since    1.0.0
+     */
     private function handleRequest()
     {
         $ok = !empty($_REQUEST['client_id']);
@@ -125,6 +140,11 @@ class LTI_Platform_Public
         }
     }
 
+    /**
+     * Display the LTI tool in an iframe.
+     *
+     * @since    1.0.0
+     */
     private function renderTool()
     {
         $allowed = array('em' => array());
@@ -199,6 +219,12 @@ class LTI_Platform_Public
         get_footer();
     }
 
+    /**
+     * Send an LTI message to a tool.
+     *
+     * @since    1.0.0
+     * @param    bool      $deeplink  Whether a content-item (deep linking) message is to be sent
+     */
     public function message($deeplink = false)
     {
         $debug = false;
@@ -428,6 +454,14 @@ class LTI_Platform_Public
         }
     }
 
+    /**
+     * Get the WordPress post for an LTI tool.
+     *
+     * @since    1.0.0
+     * @param    int       $post_id   ID of WordPress post record
+     *
+     * @return   WP_Post   WordPress post record.
+     */
     private function get_post($post_id)
     {
         $post = null;
@@ -438,6 +472,13 @@ class LTI_Platform_Public
         return $post;
     }
 
+    /**
+     * Get the attributes from a shortcode.
+     *
+     * @since    1.0.0
+     * @param    WP_Post   $post      WordPress post record
+     * @param    string    $id        ID of shortcode instance
+     */
     private function get_link_atts($post, $id)
     {
         $link_atts = array();
@@ -464,6 +505,12 @@ class LTI_Platform_Public
         return $link_atts;
     }
 
+    /**
+     * Get the LTI platform object for connections with an LTI tool.
+     *
+     * @since    1.0.0
+     * @return   Platform  Platform object
+     */
     private function get_platform()
     {
         $options = LTI_Platform_Tool::getOptions();
@@ -489,6 +536,12 @@ class LTI_Platform_Public
         return $platform;
     }
 
+    /**
+     * Get HTML for selecting an LTI tool.
+     *
+     * @since    1.0.0
+     * @return   string    HTML
+     */
     private function get_tools_list()
     {
         $hereValue = function($text) {
@@ -547,6 +600,14 @@ EOD;
         return $list;
     }
 
+    /**
+     * Get whether tool supports the content-item (deep linking) message.
+     *
+     * @since    1.0.0
+     * @param    string    $code      Code for LTI tool.
+     *
+     * @return   object    Object with useContentItem property
+     */
     private function get_tool($code)
     {
         $obj = new \stdClass();
@@ -556,6 +617,12 @@ EOD;
         return $obj;
     }
 
+    /**
+     * Display the HTML for handling an incoming content-item (deep linking) message.
+     *
+     * @since    1.0.0
+     * @param    string    $code      Code for LTI tool.
+     */
     private function content($code)
     {
         $tool = LTI_Platform_Tool::fromCode($code, LTI_Platform::$ltiPlatformDataConnector);
@@ -628,6 +695,13 @@ EOD;
         echo wp_kses($html, $allowed);
     }
 
+    /**
+     * Get the entry for a shortcode attribute.
+     *
+     * @since    1.0.0
+     * @param    string    $name      Name of attribute.
+     * @param    string    $value     Value of attribute.
+     */
     private static function setAttribute($name, $value)
     {
         $attr = '';
@@ -649,6 +723,13 @@ EOD;
         return $attr;
     }
 
+    /**
+     * Display an error page.
+     *
+     * @since    1.0.0
+     * @param    string    $reason    Reason for error.
+     * @param    bool      $debug     Status of debug mode.
+     */
     private function error_page($reason, $debug = false)
     {
         $allowed = array('em' => array());

@@ -210,6 +210,13 @@ class DataConnector_wp extends DataConnector\DataConnector
         return $tools;
     }
 
+    /**
+     * Load the LTI tool from the WordPress post record.
+     *
+     * @param Tool      $tool       Tool object
+     * @param WP_Post   $post       WordPress post
+     * @param int       $blogId     ID of associated site
+     */
     public function fromPost($tool, $post, $blogId)
     {
         $tool->setRecordId(intval($post->ID));

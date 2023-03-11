@@ -66,6 +66,11 @@ class LTI_Platform_Admin
         $this->version = $version;
     }
 
+    /**
+     * Set CSS and scripts to be loaded.
+     *
+     * @since    1.0.0
+     */
     public function enqueue_scripts($hook)
     {
         if (($hook === 'post-new.php') || ($hook === 'post.php')) {
@@ -77,6 +82,12 @@ class LTI_Platform_Admin
         }
     }
 
+    /**
+     * Add a settings link to plugin page.
+     *
+     * @since    2.2.0
+     * @return   array    Array of plugin page links.
+     */
     public function plugin_settings_link($links)
     {
         if (is_multisite()) {
@@ -92,6 +103,11 @@ class LTI_Platform_Admin
         return $links;
     }
 
+    /**
+     * Define the plugin menu options for a site.
+     *
+     * @since    1.0.0
+     */
     public function options_page()
     {
         $menu = add_options_page('LTI Tools', 'LTI Tools', 'manage_options', $this->plugin_name, array($this, 'view_page_html'));
@@ -107,6 +123,11 @@ class LTI_Platform_Admin
         add_action("load-{$submenu}", array($this, 'load_submenu'));
     }
 
+    /**
+     * Define the plugin menu options at the network level.
+     *
+     * @since    2.0.0
+     */
     public function network_options_page()
     {
         $menu = add_submenu_page('settings.php', 'Network LTI Tools', 'Network LTI Tools', 'manage_options', $this->plugin_name,
@@ -124,6 +145,11 @@ class LTI_Platform_Admin
         add_action("network_admin_edit_{$this->plugin_name}-settings", array($this, 'save_network_options'));
     }
 
+    /**
+     * Save the plugin options.
+     *
+     * @since    2.0.0
+     */
     public function save_network_options()
     {
         $rawoptions = $_POST[LTI_Platform::get_settings_name()];
@@ -164,6 +190,11 @@ class LTI_Platform_Admin
         exit;
     }
 
+    /**
+     * Display a message when settings have been successfully saved.
+     *
+     * @since    2.0.0
+     */
     public function save_network_notice_success()
     {
         echo('    <div class="notice notice-success is-dismissible">' . "\n");
@@ -171,6 +202,11 @@ class LTI_Platform_Admin
         echo('    </div>' . "\n");
     }
 
+    /**
+     * Initialise the table.
+     *
+     * @since    1.0.0
+     */
     public function load_tools_table()
     {
         $screen = get_current_screen();
@@ -185,11 +221,25 @@ class LTI_Platform_Admin
         ));
     }
 
+    /**
+     * Add filter for when plugin menu option is displayed.
+     *
+     * @since    1.0.0
+     */
     public function load_submenu()
     {
         add_filter('submenu_file', array($this, 'submenu_file'), 10, 2);
     }
 
+    /**
+     * Get name of plugin to highlight in settings menu.
+     *
+     * @since    1.0.0
+     * @param    string    $submenu_file    The submenu file.
+     * @param    string    $parent_file     The submenu item's parent file.
+     *
+     * @return   string    Name of submenu file to highlight.
+     */
     function submenu_file($submenu_file, $parent_file)
     {
 // Ensure plugin remains highlighted as current in menu
@@ -200,6 +250,11 @@ class LTI_Platform_Admin
         return $submenu_file;
     }
 
+    /**
+     * Initialise settings fields.
+     *
+     * @since    1.0.0
+     */
     public function settings_init()
     {
         register_setting($this->plugin_name, LTI_Platform::get_settings_name());
@@ -273,37 +328,72 @@ class LTI_Platform_Admin
             array('label_for' => 'id_storage', 'name' => 'storage', 'options' => $options));
     }
 
+    /**
+     * Display HTML for general section of settings page.
+     *
+     * @since    1.0.0
+     */
     public function section_general()
     {
 
     }
 
+    /**
+     * Display HTML for privacy section of settings page.
+     *
+     * @since    1.0.0
+     */
     public function section_privacy()
     {
 
     }
 
+    /**
+     * Display HTML for roles section of settings page.
+     *
+     * @since    1.0.0
+     */
     public function section_roles()
     {
         echo '<p>' . __('Select the default LTI role(s) to be passed to a tool for each WordPress role.', $this->plugin_name) . "</p>\n";
     }
 
+    /**
+     * Display HTML for presentation section of settings page.
+     *
+     * @since    1.0.0
+     */
     public function section_presentation()
     {
 
     }
 
+    /**
+     * Display HTML for security section of settings page.
+     *
+     * @since    1.0.0
+     */
     public function section_security()
     {
 
     }
 
+    /**
+     * Display HTML for a checkbox on settings page.
+     *
+     * @since    1.0.0
+     */
     public function field_checkbox($args)
     {
         echo('<input id="' . esc_attr($args['label_for']) . '" type="checkbox" aria-required="false" value="true" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . ']"' .
         checked(isset($args['options'][$args['name']]) && ($args['options'][$args['name']] === 'true'), true, false) . '>' . "\n");
     }
 
+    /**
+     * Display HTML for a text field on settings page.
+     *
+     * @since    1.0.0
+     */
     public function field_text($args)
     {
         echo('<input id="' . esc_attr($args['label_for']) . '" type="text" aria-required="false" value="');
@@ -313,6 +403,11 @@ class LTI_Platform_Admin
         echo('" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . ']">' . "\n");
     }
 
+    /**
+     * Display HTML for a textarea on settings page.
+     *
+     * @since    1.0.0
+     */
     public function field_textarea($args)
     {
         echo('<textarea id=" ' . esc_attr($args['label_for']) . '" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . ']" class="code" rows="' . esc_attr($args['rows']) . '" cols="' . esc_attr($args['cols']) . '">');
@@ -322,6 +417,11 @@ class LTI_Platform_Admin
         echo('</textarea>' . "\n");
     }
 
+    /**
+     * Display HTML for a role selection on settings page.
+     *
+     * @since    1.0.0
+     */
     public function field_role($args)
     {
         echo('<select id="' . esc_attr($args['label_for']) . '" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . '][]" size="6" multiple>' . "\n");
@@ -340,6 +440,11 @@ class LTI_Platform_Admin
         echo('</select>' . "\n");
     }
 
+    /**
+     * Display HTML for a target selection on settings page.
+     *
+     * @since    1.0.0
+     */
     public function field_target($args)
     {
         echo('<select id="' . esc_attr($args['label_for']) . '" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . ']">' . "\n");
@@ -354,6 +459,11 @@ class LTI_Platform_Admin
         echo('</select>' . "\n");
     }
 
+    /**
+     * Display HTML for settings page.
+     *
+     * @since    1.0.0
+     */
     public function options_page_html()
     {
         if (!current_user_can('manage_options')) {
@@ -365,6 +475,11 @@ class LTI_Platform_Admin
         require_once(plugin_dir_path(dirname(__FILE__)) . 'admin/partials/lti-platform-admin-settings.php');
     }
 
+    /**
+     * Display HTML for LTI tools list page.
+     *
+     * @since    1.0.0
+     */
     public function view_page_html()
     {
         if (!current_user_can('manage_options')) {
@@ -373,6 +488,11 @@ class LTI_Platform_Admin
         require_once plugin_dir_path(dirname(__FILE__)) . 'admin/partials/lti-platform-admin-view.php';
     }
 
+    /**
+     * Display HTML for LTI tool edit page.
+     *
+     * @since    1.0.0
+     */
     public function edit_page_html()
     {
         if (!current_user_can('manage_options')) {
@@ -394,6 +514,11 @@ class LTI_Platform_Admin
         require_once plugin_dir_path(dirname(__FILE__)) . 'admin/partials/lti-platform-admin-edit.php';
     }
 
+    /**
+     * Display HTML when saving changes was not successful.
+     *
+     * @since    1.0.0
+     */
     public function error_update()
     {
         $allowed = array('em' => array());
@@ -402,6 +527,11 @@ class LTI_Platform_Admin
         echo('  </div>' . "\n");
     }
 
+    /**
+     * Update LTI tool definition.
+     *
+     * @since    1.0.0
+     */
     private function update_tool($tool)
     {
         $tool->name = sanitize_text_field($_POST['name']);

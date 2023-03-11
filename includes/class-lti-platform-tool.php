@@ -36,16 +36,72 @@ use ceLTIc\LTI\Tool;
 class LTI_Platform_Tool extends Tool
 {
 
+    /**
+     * Type of WordPress post for a site-level LTI tool.
+     */
     const POST_TYPE = 'lti-platform-tool';
+
+    /**
+     * Type of WordPress post for a network-level LTI tool.
+     */
     const POST_TYPE_NETWORK = 'lti-platform-ms-tool';
 
+    /**
+     * The ID of the site associated with the tool.
+     *
+     * @since    1.0.0
+     * @access   public
+     * @var      int       $blogId    The ID of the site associated with the tool.
+     */
     public $blogId = null;
+
+    /**
+     * The code of the LTI tool.
+     *
+     * @since    1.0.0
+     * @access   public
+     * @var      string    $code      Code for LTI tool.
+     */
     public $code = null;
+
+    /**
+     * Whether the LTI tool supports the content-item (deep linking) message.
+     *
+     * @since    1.0.0
+     * @access   public
+     * @var      bool      $useContentItem  True if content-item (deep linking) message is supported.
+     */
     public $useContentItem = false;
+
+    /**
+     * URL for content-item (deep linking) message.
+     *
+     * @since    1.0.0
+     * @access   public
+     * @var      string    $contentItemUrl  URL for content-item (deep linking) message.
+     */
     public $contentItemUrl = null;
+
+    /**
+     * Whether the tool has been moved to the trash bin.
+     *
+     * @since    1.0.0
+     * @access   public
+     * @var      bool      $deleted   True when the tool is in the trash bin.
+     */
     public $deleted = false;
     private static $options = null;
 
+    /**
+     * Get the LTI tool from its code.
+     *
+     * @since    1.0.0
+     * @access   public static
+     * @param    string    $code      Code for LTI tool.
+     * @param    DataConnector_wp  $dataConnector  Data connector object
+     *
+     * @return   LTI_Platform_Tool Tool instance
+     */
     public static function fromCode($code, $dataConnector)
     {
         $tool = null;
@@ -73,6 +129,12 @@ class LTI_Platform_Tool extends Tool
         return $tool;
     }
 
+    /**
+     * Get the plugin settings values.
+     *
+     * @since    1.0.0
+     * @return   array     Array of settings.
+     */
     public static function getOptions()
     {
         if (empty(self::$options)) {
@@ -103,6 +165,15 @@ class LTI_Platform_Tool extends Tool
         return self::$options;
     }
 
+    /**
+     * Get the value of a setting.
+     *
+     * @since    1.0.0
+     * @param    string    Name of setting
+     * @param    string    Default value
+     *
+     * @return   string    Setting value.
+     */
     public static function getOption($name, $default)
     {
         self::getOptions();
@@ -112,6 +183,12 @@ class LTI_Platform_Tool extends Tool
         return $default;
     }
 
+    /**
+     * Initialize the class.
+     *
+     * @since    1.0.0
+     * @param    DataConnector_wp  $dataConnector  Data connector object
+     */
     public function __construct($dataConnector = null)
     {
         parent::__construct($dataConnector);
@@ -134,6 +211,14 @@ class LTI_Platform_Tool extends Tool
         }
     }
 
+    /**
+     * Save the tool.
+     *
+     * @since    1.0.0
+     * @param    bool      $quiet     True if no messages should be displayed
+     *
+     * @return   bool      True if the tool was successfully saved.
+     */
     public function save($quiet = false)
     {
         $platform = new LTI_Platform_Platform(LTI_platform::$ltiPlatformDataConnector);
@@ -171,6 +256,13 @@ class LTI_Platform_Tool extends Tool
         return $ok;
     }
 
+    /**
+     * Display a message.
+     *
+     * @since    1.0.0
+     * @param    string    Message to display
+     * @param    string    Type of message ('success' or 'error') to display
+     */
     public function save_notice($message, $type = 'success')
     {
         echo('    <div class="notice notice-' . esc_html($type) . ' is-dismissible">' . "\n");
@@ -178,37 +270,75 @@ class LTI_Platform_Tool extends Tool
         echo('    </div>' . "\n");
     }
 
+    /**
+     * Display a message when a tool has been successfully saved.
+     *
+     * @since    1.0.0
+     */
     public function save_notice_success()
     {
         $this->save_notice('Tool updated.');
     }
 
+    /**
+     * Display a message when saving a tool has not been successful.
+     *
+     * @since    1.0.0
+     */
     public function save_notice_error()
     {
         $this->save_notice('An error occurred when saving tool.', 'error');
     }
 
+    /**
+     * Display a message when saving a tool has not been successful because its code is already in use.
+     *
+     * @since    1.0.0
+     */
     public function save_notice_duplicate()
     {
         $this->save_notice('A tool already exists with this code.', 'error');
     }
 
+    /**
+     * Display a message when enabling a tool has not been successful.
+     *
+     * @since    1.0.0
+     */
     public function save_notice_disabled()
     {
         $this->save_notice('This tool cannot be enabled because it is not fully configured for either LTI 1.0 or LTI 1.3, or no private key has been defined.',
             'warning');
     }
 
+    /**
+     * Move the tool to the trash bin.
+     *
+     * @since    1.0.0
+     * @return   bool      True if successful.
+     */
     public function trash()
     {
         return $this->dataConnector->trashTool($this);
     }
 
+    /**
+     * Restore the tool from the trash bin.
+     *
+     * @since    1.0.0
+     * @return   bool      True if successful.
+     */
     public function restore()
     {
         return $this->dataConnector->restoreTool($this);
     }
 
+    /**
+     * Check whether the tool can be accessed using LTI 1.3.
+     *
+     * @since    1.0.0
+     * @return   bool      True if LTI 1.3 is available.
+     */
     public function canUseLTI13()
     {
         self::getOptions();
@@ -216,11 +346,22 @@ class LTI_Platform_Tool extends Tool
             !empty(self::$options['kid']) && !empty(self::$options['privatekey']);
     }
 
+    /**
+     * Get defined LTI tools.
+     *
+     * @since    1.0.0
+     * @return   array     Array of LTI tools.
+     */
     public static function all($args = array())
     {
         return LTI_Platform::$ltiPlatformDataConnector->getToolsWithArgs($args);
     }
 
+    /**
+     * Register the LTI tool types.
+     *
+     * @since    1.0.0
+     */
     public static function register()
     {
         register_post_type(self::POST_TYPE,
@@ -248,6 +389,12 @@ class LTI_Platform_Tool extends Tool
         add_shortcode(LTI_Platform::get_plugin_name(), array('LTI_Platform_Tool', 'shortcode'));
     }
 
+    /**
+     * Get the HTML to replace the shortcode for an LTI tool.
+     *
+     * @since    1.0.0
+     * @return   string    HTML to display.
+     */
     public static function shortcode($atts, $content, $tag)
     {
         global $post;
@@ -357,6 +504,12 @@ class LTI_Platform_Tool extends Tool
         return $html;
     }
 
+    /**
+     * Check whether an LTI tool can be enabled.
+     *
+     * @since    1.0.0
+     * @return   bool      True if the tool can be enabled.
+     */
     public function canBeEnabled()
     {
         return !empty($this->messageUrl) &&

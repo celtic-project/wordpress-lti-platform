@@ -39,6 +39,13 @@ use ceLTIc\LTI\Util;
 class LTI_Platform_Platform extends Platform
 {
 
+    /**
+     * Content item received from tool.
+     *
+     * @since    1.0.0
+     * @access   public
+     * @var      object    $contentItem  The content item.
+     */
     public $contentItem = null;
 
     /**
