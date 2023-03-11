@@ -106,8 +106,7 @@ class LTI_Platform
         $this->set_locale();
         $this->define_admin_hooks();
         $this->define_public_hooks();
-
-        $this->ok = $this->check_dependencies();
+        $this->check_dependencies();
         if ($this->ok && class_exists('DataConnector_wp')) {
             self::$ltiPlatformDataConnector = DataConnector_wp::createDataConnector($wpdb->dbh, $wpdb->base_prefix);
             if (defined('WP_NETWORK_ADMIN') && WP_NETWORK_ADMIN) {
@@ -339,8 +338,8 @@ class LTI_Platform
      */
     private function check_dependencies()
     {
-        $ok = $this->check_lti_library();
-        if (!$ok) {
+        $this->ok = $this->check_lti_library();
+        if (!$this->ok) {
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
             add_action('all_admin_notices', array($this, 'error_deactivate'));
             $plugin_name = self::get_plugin_name();
@@ -349,8 +348,5 @@ class LTI_Platform
                 unset($_GET['activate']);
             }
         }
-
-        return $ok;
     }
-
 }

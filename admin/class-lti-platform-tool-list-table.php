@@ -514,35 +514,6 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
     }
 
     /**
-     * Get the HTML for a checkbox column.
-     *
-     * @since    1.0.0
-     * @return   string    HTML for checkbox column.
-     */
-    public function column_cb($item)
-    {
-        return sprintf(
-            '<input type="checkbox" name="%1$s[]" value="%2$s" />', $this->_args['singular'], $item->getRecordId()
-        );
-    }
-
-    /**
-     * Get the HTML for the tool name column.
-     *
-     * @since    1.0.0
-     * @return   string    HTML for name column.
-     */
-    public function column_name($item)
-    {
-        if (in_array($item->code, $this->mu_items)) {
-            return sprintf('<span style="text-decoration: line-through;" title="A network LTI tool exists with same code">%1$s</span>',
-                esc_html($item->name));
-        } else {
-            return sprintf('<strong>%1$s</strong>', esc_html($item->name));
-        }
-    }
-
-    /**
      * Get the HTML for the bulk actions.
      *
      * @since    1.0.0
@@ -607,6 +578,35 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         }
 
         return $this->row_actions($actions);
+    }
+
+    /**
+     * Get the HTML for a checkbox column.
+     *
+     * @since    1.0.0
+     * @return   string    HTML for checkbox column.
+     */
+    public function column_cb($item)
+    {
+        return sprintf(
+            '<input type="checkbox" name="%1$s[]" value="%2$s" />', $this->_args['singular'], $item->getRecordId()
+        );
+    }
+
+    /**
+     * Get the HTML for the tool name column.
+     *
+     * @since    1.0.0
+     * @return   string    HTML for name column.
+     */
+    public function column_name($item)
+    {
+        if (in_array($item->code, $this->mu_items)) {
+            return sprintf('<span style="text-decoration: line-through;" title="A network LTI tool exists with same code">%1$s</span>',
+                esc_html($item->name));
+        } else {
+            return sprintf('<strong>%1$s</strong>', esc_html($item->name));
+        }
     }
 
     /**

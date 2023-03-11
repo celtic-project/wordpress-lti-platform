@@ -380,7 +380,7 @@ echo('              <span class="description">' . esc_html__('(PEM format)', LTI
 echo('            </label>' . "\n");
 echo('          </th>' . "\n");
 echo('          <td>' . "\n");
-echo('            <textarea id="id_publickey" name="publickey" class="regular-text">' . esc_textarea($tool->rsaKey) . '</textarea>' . "\n");
+echo('            <textarea id="id_publickey" name="publickey" class="code" rows="10">' . esc_textarea($tool->rsaKey) . '</textarea>' . "\n");
 echo('          </td>' . "\n");
 echo('        </tr>' . "\n");
 echo('      </tbody>' . "\n");
