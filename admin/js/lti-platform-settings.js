@@ -8,7 +8,7 @@
         return;
       }
     };
-    $(document).on('change', 'input[type="text"], input[type="checkbox"]', function () {
+    $(document).on('change', 'input[type="text"], input[type="checkbox"], textarea', function () {
       window.lti_platform_changed = true;
     });
     $(document).on('submit', 'form', function () {
