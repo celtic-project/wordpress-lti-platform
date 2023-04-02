@@ -164,7 +164,7 @@ echo '    <p>' . __('Select the LTI role(s) to be passed to this tool for each W
 echo('' . "\n");
 echo('    <table class="form-table">' . "\n");
 echo('      <tbody>' . "\n");
-$roles = get_editable_roles();
+$roles = LTI_Platform::get_roles();
 foreach ($roles as $key => $role) {
     $setting = explode(',', $tool->getSetting("role_{$key}", ''));
     echo('        <tr class="form-field form-required">' . "\n");

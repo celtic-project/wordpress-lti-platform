@@ -130,60 +130,6 @@ class LTI_Platform_Tool extends Tool
     }
 
     /**
-     * Get the plugin settings values.
-     *
-     * @since    1.0.0
-     * @return   array     Array of settings.
-     */
-    public static function getOptions()
-    {
-        if (empty(self::$options)) {
-            if (is_multisite()) {
-                self::$options = get_site_option(LTI_Platform::get_settings_name(), array());
-            } else {
-                self::$options = get_option(LTI_Platform::get_settings_name(), array());
-            }
-            if (!is_array(self::$options)) {
-                self::$options = array();
-            }
-            require_once ABSPATH . 'wp-admin/includes/user.php';
-            $roles = get_editable_roles();
-            $defaultroles = array(
-                'administrator' => array('administrator', 'instructor'),
-                'editor' => array('instructor'),
-                'author' => array('learner'),
-                'contributor' => array('learner'),
-                'subscriber' => array('learner')
-            );
-            foreach (array_keys($roles) as $role) {
-                if (!isset(self::$options["role_{$role}"]) && isset($defaultroles[$role])) {
-                    self::$options["role_{$role}"] = $defaultroles[$role];
-                }
-            }
-        }
-
-        return self::$options;
-    }
-
-    /**
-     * Get the value of a setting.
-     *
-     * @since    1.0.0
-     * @param    string    Name of setting
-     * @param    string    Default value
-     *
-     * @return   string    Setting value.
-     */
-    public static function getOption($name, $default)
-    {
-        self::getOptions();
-        if (array_key_exists($name, self::$options)) {
-            $default = self::$options[$name];
-        }
-        return $default;
-    }
-
-    /**
      * Initialize the class.
      *
      * @since    1.0.0
@@ -192,22 +138,19 @@ class LTI_Platform_Tool extends Tool
     public function __construct($dataConnector = null)
     {
         parent::__construct($dataConnector);
-        $options = self::getOptions();
-        $this->setSetting('sendUserName',
-            (isset($options['sendusername']) && ($options['sendusername'] === 'true')) ? 'true' : 'false');
-        $this->setSetting('sendUserId', (isset($options['senduserid']) && ($options['senduserid'] === 'true')) ? 'true' : 'false');
-        $this->setSetting('sendUserEmail',
-            (isset($options['senduseremail']) && ($options['senduseremail'] === 'true')) ? 'true' : 'false');
-        $this->setSetting('sendUserRole',
-            (isset($options['senduserrole']) && ($options['senduserrole'] === 'true')) ? 'true' : 'false');
-        $this->setSetting('sendUserUsername',
-            (isset($options['senduserusername']) && ($options['senduserusername'] === 'true')) ? 'true' : 'false');
-        $this->setSetting('presentationTarget', (!empty($options['presentationtarget'])) ? $options['presentationtarget'] : '');
-        $this->setSetting('presentationWidth', (!empty($options['presentationwidth'])) ? $options['presentationwidth'] : '');
-        $this->setSetting('presentationHeight', (!empty($options['presentationheight'])) ? $options['presentationheight'] : '');
-        $roles = get_editable_roles();
-        foreach (array_keys($roles) as $role) {
-            $this->setSetting("role_{$role}", (isset($options["role_{$role}"])) ? implode(',', $options["role_{$role}"]) : '');
+        $this->setSetting('sendUserName', LTI_Platform::getOption('sendusername', 'false'));
+        $this->setSetting('sendUserId', LTI_Platform::getOption('senduserid', 'false'));
+        $this->setSetting('sendUserEmail', LTI_Platform::getOption('senduseremail', 'false'));
+        $this->setSetting('sendUserRole', LTI_Platform::getOption('senduserrole', 'false'));
+        $this->setSetting('sendUserUsername', LTI_Platform::getOption('senduserusername', 'false'));
+        $this->setSetting('presentationTarget', LTI_Platform::getOption('presentationtarget', ''));
+        $this->setSetting('presentationWidth', LTI_Platform::getOption('presentationwidth', ''));
+        $this->setSetting('presentationHeight', LTI_Platform::getOption('presentationheight', ''));
+        $options = LTI_Platform::getOptions();
+        foreach ($options as $name => $value) {
+            if (strpos($name, 'role_') === 0) {
+                $this->setSetting($name, implode(',', $options[$name]));
+            }
         }
     }
 
@@ -341,9 +284,8 @@ class LTI_Platform_Tool extends Tool
      */
     public function canUseLTI13()
     {
-        self::getOptions();
         return !empty($this->initiateLoginUrl) && !empty($this->redirectionUris) &&
-            !empty(self::$options['kid']) && !empty(self::$options['privatekey']);
+            !empty(LTI_Platform::getOption('kid', '')) && !empty(LTI_Platform::getOption('privatekey', ''));
     }
 
     /**

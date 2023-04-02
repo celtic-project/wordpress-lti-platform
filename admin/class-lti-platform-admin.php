@@ -174,12 +174,6 @@ class LTI_Platform_Admin
             }
             $options[$option] = $value;
         }
-        $roles = get_editable_roles();
-        foreach (array_keys($roles) as $role) {
-            if (!isset($options["role_{$role}"])) {
-                $options["role_{$role}"] = array();
-            }
-        }
         if (is_multisite()) {
             update_site_option(LTI_Platform::get_settings_name(), $options);
         } else {
@@ -258,47 +252,38 @@ class LTI_Platform_Admin
     public function settings_init()
     {
         register_setting($this->plugin_name, LTI_Platform::get_settings_name());
-        $options = LTI_Platform_Tool::getOptions();
 
         add_settings_section(
             'section_general', __('General Settings', $this->plugin_name), array($this, 'section_general'), $this->plugin_name
         );
         add_settings_field('field_debug', __('Debug mode?', $this->plugin_name), array($this, 'field_checkbox'), $this->plugin_name,
-            'section_general', array('label_for' => 'id_debug', 'name' => 'debug', 'options' => $options));
+            'section_general', array('label_for' => 'id_debug', 'name' => 'debug'));
         add_settings_field('field_uninstall', __('Delete data on uninstall?', $this->plugin_name), array($this, 'field_checkbox'),
-            $this->plugin_name, 'section_general',
-            array('label_for' => 'id_uninstall', 'name' => 'uninstall', 'options' => $options));
+            $this->plugin_name, 'section_general', array('label_for' => 'id_uninstall', 'name' => 'uninstall'));
         add_settings_field('field_platformguid', __('Platform GUID', $this->plugin_name), array($this, 'field_text'),
-            $this->plugin_name, 'section_general',
-            array('label_for' => 'id_platformguid', 'name' => 'platformguid', 'options' => $options));
+            $this->plugin_name, 'section_general', array('label_for' => 'id_platformguid', 'name' => 'platformguid'));
 
         add_settings_section(
             'section_privacy', __('Privacy Settings', $this->plugin_name), array($this, 'section_privacy'), $this->plugin_name
         );
         add_settings_field('field_name', __('Send user\'s name?', $this->plugin_name), array($this, 'field_checkbox'),
-            $this->plugin_name, 'section_privacy',
-            array('label_for' => 'id_sendusername', 'name' => 'sendusername', 'options' => $options));
+            $this->plugin_name, 'section_privacy', array('label_for' => 'id_sendusername', 'name' => 'sendusername'));
         add_settings_field('field_id', __('Send user\'s ID?', $this->plugin_name), array($this, 'field_checkbox'),
-            $this->plugin_name, 'section_privacy',
-            array('label_for' => 'id_senduserid', 'name' => 'senduserid', 'options' => $options));
+            $this->plugin_name, 'section_privacy', array('label_for' => 'id_senduserid', 'name' => 'senduserid'));
         add_settings_field('field_email', __('Send user\'s email?', $this->plugin_name), array($this, 'field_checkbox'),
-            $this->plugin_name, 'section_privacy',
-            array('label_for' => 'id_senduseremail', 'name' => 'senduseremail', 'options' => $options));
+            $this->plugin_name, 'section_privacy', array('label_for' => 'id_senduseremail', 'name' => 'senduseremail'));
         add_settings_field('field_role', __('Send user\'s role?', $this->plugin_name), array($this, 'field_checkbox'),
-            $this->plugin_name, 'section_privacy',
-            array('label_for' => 'id_senduserrole', 'name' => 'senduserrole', 'options' => $options));
+            $this->plugin_name, 'section_privacy', array('label_for' => 'id_senduserrole', 'name' => 'senduserrole'));
         add_settings_field('field_username', __('Send user\'s username?', $this->plugin_name), array($this, 'field_checkbox'),
-            $this->plugin_name, 'section_privacy',
-            array('label_for' => 'id_senduserusername', 'name' => 'senduserusername', 'options' => $options));
+            $this->plugin_name, 'section_privacy', array('label_for' => 'id_senduserusername', 'name' => 'senduserusername'));
 
         add_settings_section(
             'section_roles', __('Role Mappings', $this->plugin_name), array($this, 'section_roles'), $this->plugin_name
         );
-        $roles = get_editable_roles();
+        $roles = LTI_Platform::get_roles();
         foreach ($roles as $key => $role) {
             add_settings_field("field_role_{$key}", __($role['name'], $this->plugin_name), array($this, 'field_role'),
-                $this->plugin_name, 'section_roles',
-                array('label_for' => "id_role_{$key}", 'name' => "role_{$key}", 'options' => $options));
+                $this->plugin_name, 'section_roles', array('label_for' => "id_role_{$key}", 'name' => "role_{$key}"));
         }
 
         add_settings_section(
@@ -307,25 +292,24 @@ class LTI_Platform_Admin
         );
         add_settings_field('field_target', __('Presentation target', $this->plugin_name), array($this, 'field_target'),
             $this->plugin_name, 'section_presentation',
-            array('label_for' => 'id_presentationtarget', 'name' => 'presentationtarget', 'options' => $options));
+            array('label_for' => 'id_presentationtarget', 'name' => 'presentationtarget'));
         add_settings_field('field_width', __('Width of pop-up window or iframe', $this->plugin_name), array($this, 'field_text'),
-            $this->plugin_name, 'section_presentation',
-            array('label_for' => 'id_presentationwidth', 'name' => 'presentationwidth', 'options' => $options));
+            $this->plugin_name, 'section_presentation', array('label_for' => 'id_presentationwidth', 'name' => 'presentationwidth'));
         add_settings_field('field_height', __('Height of pop-up window or iframe', $this->plugin_name), array($this, 'field_text'),
             $this->plugin_name, 'section_presentation',
-            array('label_for' => 'id_presentationheight', 'name' => 'presentationheight', 'options' => $options));
+            array('label_for' => 'id_presentationheight', 'name' => 'presentationheight'));
 
         add_settings_section(
             'section_security', __('Security Settings', $this->plugin_name), array($this, 'section_security'), $this->plugin_name
         );
         add_settings_field('field_kid', __('Key ID', $this->plugin_name), array($this, 'field_text'), $this->plugin_name,
-            'section_security', array('label_for' => 'id_kid', 'name' => 'kid', 'options' => $options));
+            'section_security', array('label_for' => 'id_kid', 'name' => 'kid'));
         add_settings_field('field_privatekey', __('Private key', $this->plugin_name), array($this, 'field_textarea'),
             $this->plugin_name, 'section_security',
-            array('label_for' => 'id_privatekey', 'name' => 'privatekey', 'rows' => '10', 'cols' => '65', 'options' => $options));
+            array('label_for' => 'id_privatekey', 'name' => 'privatekey', 'rows' => '10', 'cols' => '65'));
         add_settings_field('field_storage', __('Offer platform storage to tools?', $this->plugin_name),
             array($this, 'field_checkbox'), $this->plugin_name, 'section_security',
-            array('label_for' => 'id_storage', 'name' => 'storage', 'options' => $options));
+            array('label_for' => 'id_storage', 'name' => 'storage'));
     }
 
     /**
@@ -385,8 +369,9 @@ class LTI_Platform_Admin
      */
     public function field_checkbox($args)
     {
+        $checked = LTI_Platform::getOption($args['name'], 'false');
         echo('<input id="' . esc_attr($args['label_for']) . '" type="checkbox" aria-required="false" value="true" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . ']"' .
-        checked(isset($args['options'][$args['name']]) && ($args['options'][$args['name']] === 'true'), true, false) . '>' . "\n");
+        checked($checked === 'true', true, false) . '>' . "\n");
     }
 
     /**
@@ -396,10 +381,9 @@ class LTI_Platform_Admin
      */
     public function field_text($args)
     {
+        $text = LTI_Platform::getOption($args['name'], '');
         echo('<input id="' . esc_attr($args['label_for']) . '" type="text" aria-required="false" value="');
-        if (isset($args['options'][$args['name']])) {
-            echo(esc_attr($args['options'][$args['name']]));
-        }
+        echo(esc_attr($text));
         echo('" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . ']">' . "\n");
     }
 
@@ -410,10 +394,9 @@ class LTI_Platform_Admin
      */
     public function field_textarea($args)
     {
+        $textarea = LTI_Platform::getOption($args['name'], '');
         echo('<textarea id=" ' . esc_attr($args['label_for']) . '" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . ']" class="code" rows="' . esc_attr($args['rows']) . '" cols="' . esc_attr($args['cols']) . '">');
-        if (isset($args['options'][$args['name']])) {
-            echo($args['options'][$args['name']]);
-        }
+        echo(esc_attr($textarea));
         echo('</textarea>' . "\n");
     }
 
@@ -424,19 +407,14 @@ class LTI_Platform_Admin
      */
     public function field_role($args)
     {
+        $roles = LTI_Platform::getOption($args['name'], array());
         echo('<select id="' . esc_attr($args['label_for']) . '" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . '][]" size="6" multiple>' . "\n");
-        echo('  <option value="administrator"' . selected(isset($args['options'][$args['name']]) && (in_array('administrator',
-                $args['options'][$args['name']])), true, false) . '>Administrator</option>' . "\n");
-        echo('  <option value="contentdeveloper"' . selected(isset($args['options'][$args['name']]) && (in_array('contentdeveloper',
-                $args['options'][$args['name']])), true, false) . '>Content developer</option>' . "\n");
-        echo('  <option value="instructor"' . selected(isset($args['options'][$args['name']]) && (in_array('instructor',
-                $args['options'][$args['name']])), true, false) . '>Instructor</option>' . "\n");
-        echo('  <option value="learner"' . selected(isset($args['options'][$args['name']]) && (in_array('learner',
-                $args['options'][$args['name']])), true, false) . '>Learner</option>' . "\n");
-        echo('  <option value="mentor"' . selected(isset($args['options'][$args['name']]) && (in_array('mentor',
-                $args['options'][$args['name']])), true, false) . '>Mentor</option>' . "\n");
-        echo('  <option value="teachingassistant"' . selected(isset($args['options'][$args['name']]) && (in_array('teachingassistant',
-                $args['options'][$args['name']])), true, false) . '>Teaching assistant</option>' . "\n");
+        echo('  <option value="administrator"' . selected(in_array('administrator', $roles), true, false) . '>Administrator</option>' . "\n");
+        echo('  <option value="contentdeveloper"' . selected(in_array('contentdeveloper', $roles), true, false) . '>Content developer</option>' . "\n");
+        echo('  <option value="instructor"' . selected(in_array('instructor', $roles), true, false) . '>Instructor</option>' . "\n");
+        echo('  <option value="learner"' . selected(in_array('learner', $roles), true, false) . '>Learner</option>' . "\n");
+        echo('  <option value="mentor"' . selected(in_array('mentor', $roles), true, false) . '>Mentor</option>' . "\n");
+        echo('  <option value="teachingassistant"' . selected(in_array('teachingassistant', $roles), true, false) . '>Teaching assistant</option>' . "\n");
         echo('</select>' . "\n");
     }
 
@@ -447,15 +425,12 @@ class LTI_Platform_Admin
      */
     public function field_target($args)
     {
+        $target = LTI_Platform::getOption($args['name'], '');
         echo('<select id="' . esc_attr($args['label_for']) . '" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . ']">' . "\n");
-        echo('  <option value="window"' . selected(isset($args['options'][$args['name']]) && ($args['options'][$args['name']] === 'window'),
-            true, false) . '>New window</option>' . "\n");
-        echo('  <option value="popup"' . selected(isset($args['options'][$args['name']]) && ($args['options'][$args['name']] === 'popup'),
-            true, false) . '>Pop-up window</option>' . "\n");
-        echo('  <option value="iframe"' . selected(isset($args['options'][$args['name']]) && ($args['options'][$args['name']] === 'iframe'),
-            true, false) . '>iFrame</option>' . "\n");
-        echo('  <option value="embed"' . selected(isset($args['options'][$args['name']]) && ($args['options'][$args['name']] === 'embed'),
-            true, false) . '>Embed</option>' . "\n");
+        echo('  <option value="window"' . selected($target === 'window', true, false) . '>New window</option>' . "\n");
+        echo('  <option value="popup"' . selected($target === 'popup', true, false) . '>Pop-up window</option>' . "\n");
+        echo('  <option value="iframe"' . selected($target === 'iframe', true, false) . '>iFrame</option>' . "\n");
+        echo('  <option value="embed"' . selected($target === 'embed', true, false) . '>Embed</option>' . "\n");
         echo('</select>' . "\n");
     }
 
@@ -548,7 +523,7 @@ class LTI_Platform_Admin
             (!empty($_POST['senduserrole']) && (sanitize_text_field($_POST['senduserrole'] === 'true'))) ? 'true' : null);
         $tool->setSetting('sendUserUsername',
             (!empty($_POST['senduserusername']) && (sanitize_text_field($_POST['senduserusername'] === 'true'))) ? 'true' : null);
-        $roles = get_editable_roles();
+        $roles = LTI_Platform::get_roles();
         foreach (array_keys($roles) as $role) {
             $tool->setSetting("role_{$role}",
                 (!empty($_POST["role_{$role}"])) ? sanitize_text_field(implode(',', $_POST["role_{$role}"])) : null);

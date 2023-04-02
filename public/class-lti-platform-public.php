@@ -73,8 +73,7 @@ class LTI_Platform_Public
      */
     public function enqueue_scripts()
     {
-        $options = LTI_Platform_Tool::getOptions();
-        if (!empty($options['storage'])) {
+        if (LTI_Platform::getOption('storage', 'false') === 'true') {
             wp_enqueue_script("{$this->plugin_name}-storagejs",
                 get_option('siteurl') . '/?' . LTI_Platform::get_plugin_name() . '&storagejs', array(), $this->version, false);
         }
@@ -97,8 +96,7 @@ class LTI_Platform_Public
                 echo(json_encode($this->get_tool(sanitize_text_field($_GET['tool']))));
             } else if (isset($_GET['keys'])) {
                 $jwt = LTI\Jwt\Jwt::getJwtClient();
-                $options = LTI_Platform_Tool::getOptions();
-                $keys = $jwt::getJWKS($options['privatekey'], 'RS256', $options['kid']);
+                $keys = $jwt::getJWKS(LTI_Platform::getOption('privatekey', ''), 'RS256', LTI_Platform::getOption('kid', ''));
                 header('Content-type: application/json; charset=UTF-8');
                 echo(json_encode($keys));
             } else if (isset($_GET['auth'])) {
@@ -205,8 +203,7 @@ class LTI_Platform_Public
         } else {
             $message = __('Sorry, the LTI tool could not be launched.', LTI_Platform::get_plugin_name());
             if (!empty($reason)) {
-                $options = LTI_Platform_Tool::getOptions();
-                $debug = $tool->debugMode || (isset($options['debug']) && ($options['debug'] === 'true'));
+                $debug = $tool->debugMode || (LTI_Platform::getOption('debug', 'false') === 'true');
                 if ($debug) {
                     $message .= ' <em>[' . esc_html($reason) . ']</em>';
                 }
@@ -287,7 +284,6 @@ class LTI_Platform_Public
             }
         }
         if ($ok) {
-            $options = LTI_Platform_Tool::getOptions();
             $user = wp_get_current_user();
             LTI\Tool::$defaultTool = $tool;
             $platform = $this->get_platform();
@@ -308,8 +304,8 @@ class LTI_Platform_Public
                 'tool_consumer_instance_url' => get_site_url(),
                 'tool_consumer_instance_contact_email' => get_bloginfo('admin_email'),
             );
-            if (!empty($options['platformguid'])) {
-                $params['tool_consumer_instance_guid'] = $options['platformguid'];
+            if (!empty(LTI_Platform::getOption('platformguid', ''))) {
+                $params['tool_consumer_instance_guid'] = LTI_Platform::getOption('platformguid', '');
             }
             if (!$deeplink) {
                 $msg = 'basic-lti-launch-request';
@@ -358,7 +354,7 @@ class LTI_Platform_Public
             if ($tool->getSetting('sendUserRole', 'false') === 'true') {
                 $roles = array();
                 foreach ($user->roles as $role) {
-                    if (!empty($options["role_{$role}"])) {
+                    if (!empty(LTI_Platform::getOption("role_{$role}", ''))) {
                         $roles = array_merge($roles, explode(',', $tool->getSetting("role_{$role}", '')));
                     }
                 }
@@ -513,22 +509,21 @@ class LTI_Platform_Public
      */
     private function get_platform()
     {
-        $options = LTI_Platform_Tool::getOptions();
         $platform = new LTI_Platform_Platform(LTI_platform::$ltiPlatformDataConnector);
         $platform->setKey(LTI\Tool::$defaultTool->getKey());
         $platform->secret = LTI\Tool::$defaultTool->secret;
         $platform->platformId = get_option('siteurl');
         $platform->clientId = LTI\Tool::$defaultTool->code;
         $platform->deploymentId = strval(get_current_blog_id());
-        $platform->kid = $options['kid'];
-        $platform->rsaKey = $options['privatekey'];
+        $platform->kid = LTI_Platform::getOption('kid', '');
+        $platform->rsaKey = LTI_Platform::getOption('privatekey', '');
         if (!LTI\Tool::$defaultTool->canUseLTI13()) {
             $platform->ltiVersion = LTI\Util::LTI_VERSION1;
             $platform->signatureMethod = 'HMAC-SHA1';
         } else {
             $platform->ltiVersion = LTI\Util::LTI_VERSION1P3;
             $platform->signatureMethod = 'RS256';
-            if (!empty($options['storage'])) {
+            if (LTI_Platform::getOption('storage', '') === 'true') {
                 $platform::$browserStorageFrame = '_parent';
             }
         }
@@ -735,8 +730,7 @@ EOD;
         $allowed = array('em' => array());
         $message = __('Sorry, the LTI tool could not be launched.', LTI_Platform::get_plugin_name());
         if (!empty($reason)) {
-            $options = LTI_Platform_Tool::getOptions();
-            $debug = $debug || (isset($options['debug']) && ($options['debug'] === 'true'));
+            $debug = $debug || (LTI_Platform::getOption('debug', 'false') === 'true');
             if ($debug) {
                 $message .= ' <em>[' . $reason . ']</em>';
             }

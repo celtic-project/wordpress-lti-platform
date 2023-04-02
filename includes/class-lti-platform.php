@@ -88,6 +88,15 @@ class LTI_Platform
     private $ok = true;
 
     /**
+     * Plugin option values.
+     *
+     * @since    2.2.0
+     * @access   private static
+     * @var      array    $options    Plugin options.
+     */
+    private static $options = null;
+
+    /**
      * Define the core functionality of the plugin.
      *
      * Set the plugin name and the plugin version that can be used throughout the plugin.
@@ -125,6 +134,160 @@ class LTI_Platform
     public function isOK()
     {
         return $this->ok;
+    }
+
+    /**
+     * Run the loader to execute all of the hooks with WordPress.
+     *
+     * @since    1.0.0
+     */
+    public function run()
+    {
+        if (LTI_Platform::getOption('debug', 'false') === 'true') {
+            if (function_exists('enum_exists') && enum_exists('ceLTIc\\LTI\\Enum\\LogLevel')) {
+                Util::$logLevel = LogLevel::Debug;
+            } else {
+                Util::$logLevel = Util::LOGLEVEL_DEBUG;
+            }
+        }
+        $this->loader->run();
+    }
+
+    /**
+     * The reference to the class that orchestrates the hooks with the plugin.
+     *
+     * @since     1.0.0
+     * @return    LTI_Platform_Loader    Orchestrates the hooks of the plugin.
+     */
+    public function get_loader()
+    {
+        return $this->loader;
+    }
+
+    /**
+     * Retrieve the version number of the plugin.
+     *
+     * @since     1.0.0
+     * @return    string    The version number of the plugin.
+     */
+    public function get_version()
+    {
+        return $this->version;
+    }
+
+    /**
+     * Display a message when the plugin has to be deactivated.
+     *
+     * @since    1.0.0
+     */
+    public function error_deactivate()
+    {
+        $allowed = array('em' => array());
+        echo('  <div class="notice notice-error">' . "\n");
+        echo('    <p>' . wp_kses(__('The <em>LTI  Platform</em> plugin has been deactivated because a dependency is missing; either use <em>Composer</em> to install the dependent libraries or activate the <em>ceLTIc LTI Library</em> plugin.',
+                self::get_plugin_name()), $allowed) . '</p>' . "\n");
+        echo('  </div>' . "\n");
+    }
+
+    /**
+     * The name of the plugin used to uniquely identify it within the context of
+     * WordPress and to define internationalization functionality.
+     *
+     * @since     2.0.0
+     * @return    string    The name of the plugin.
+     */
+    public static function get_plugin_name()
+    {
+        return LTI_PLATFORM_NAME;
+    }
+
+    /**
+     * Retrieve the name of the settings entry for the plugin.
+     *
+     * @since     2.0.0
+     * @return    string    The settings entry name for the plugin.
+     */
+    public static function get_settings_name()
+    {
+        return str_replace('-', '_', LTI_PLATFORM_NAME) . '_options';
+    }
+
+    /**
+     * Get the plugin settings values.
+     *
+     * @since    2.2.0
+     * @return   array     Array of settings.
+     */
+    public static function getOptions()
+    {
+        if (empty(self::$options)) {
+            if (is_multisite()) {
+                self::$options = get_site_option(LTI_Platform::get_settings_name(), array());
+            } else {
+                self::$options = get_option(LTI_Platform::get_settings_name(), array());
+            }
+            if (!is_array(self::$options)) {
+                self::$options = array();
+            }
+        }
+
+        return self::$options;
+    }
+
+    /**
+     * Get the value of a setting.
+     *
+     * @since    2.2.0
+     * @param    string    Name of setting
+     * @param    string    Default value
+     *
+     * @return   string    Setting value.
+     */
+    public static function getOption($name, $default)
+    {
+        self::getOptions();
+        if (array_key_exists($name, self::$options)) {
+            $default = self::$options[$name];
+        } elseif (strpos($name, 'role_') === 0) {
+            $defaultroles = LTI_Platform::get_default_roles();
+            if (isset($defaultroles[substr($name, 5)])) {
+                $default = $defaultroles[substr($name, 5)];
+            }
+        }
+
+        return $default;
+    }
+
+    /**
+     * Get WordPress roles.
+     *
+     * @since    2.2.0
+     * @return   array     Array of roles
+     */
+    public static function get_roles()
+    {
+        $roles = array_merge(wp_roles()->roles, get_editable_roles());
+
+        return $roles;
+    }
+
+    /**
+     * Get default role mapping for standard WordPress roles.
+     *
+     * @since    2.2.0
+     * @return   array     Array of role mappings.
+     */
+    public static function get_default_roles()
+    {
+        $defaultroles = array(
+            'administrator' => array('administrator', 'instructor'),
+            'editor' => array('instructor'),
+            'author' => array('learner'),
+            'contributor' => array('learner'),
+            'subscriber' => array('learner')
+        );
+
+        return $defaultroles;
     }
 
     /**
@@ -247,90 +410,6 @@ class LTI_Platform
     }
 
     /**
-     * Run the loader to execute all of the hooks with WordPress.
-     *
-     * @since    1.0.0
-     */
-    public function run()
-    {
-        $options = LTI_Platform_Tool::getOptions();
-        if (!empty($options['debug']) && ($options['debug'] === 'true')) {
-            Util::$logLevel = Util::LOGLEVEL_DEBUG;
-        }
-        $this->loader->run();
-    }
-
-    /**
-     * The reference to the class that orchestrates the hooks with the plugin.
-     *
-     * @since     1.0.0
-     * @return    LTI_Platform_Loader    Orchestrates the hooks of the plugin.
-     */
-    public function get_loader()
-    {
-        return $this->loader;
-    }
-
-    /**
-     * Retrieve the version number of the plugin.
-     *
-     * @since     1.0.0
-     * @return    string    The version number of the plugin.
-     */
-    public function get_version()
-    {
-        return $this->version;
-    }
-
-    /**
-     * Display a message when the plugin has to be deactivated.
-     *
-     * @since    1.0.0
-     */
-    public function error_deactivate()
-    {
-        $allowed = array('em' => array());
-        echo('  <div class="notice notice-error">' . "\n");
-        echo('    <p>' . wp_kses(__('The <em>LTI  Platform</em> plugin has been deactivated because a dependency is missing; either use <em>Composer</em> to install the dependent libraries or activate the <em>ceLTIc LTI Library</em> plugin.',
-                self::get_plugin_name()), $allowed) . '</p>' . "\n");
-        echo('  </div>' . "\n");
-    }
-
-    /**
-     * The name of the plugin used to uniquely identify it within the context of
-     * WordPress and to define internationalization functionality.
-     *
-     * @since     2.0.0
-     * @return    string    The name of the plugin.
-     */
-    public static function get_plugin_name()
-    {
-        return LTI_PLATFORM_NAME;
-    }
-
-    /**
-     * Retrieve the name of the settings entry for the plugin.
-     *
-     * @since     2.0.0
-     * @return    string    The settings entry name for the plugin.
-     */
-    public static function get_settings_name()
-    {
-        return str_replace('-', '_', LTI_PLATFORM_NAME) . '_options';
-    }
-
-    /**
-     * Check that the LTI class library is available.
-     *
-     * @since     2.0.1
-     * @return    bool    True if the library is found.
-     */
-    private function check_lti_library()
-    {
-        return class_exists('ceLTIc\LTI\Platform');
-    }
-
-    /**
      * Check that the plugin dependencies are available.
      *
      * @since     2.0.1
@@ -346,7 +425,19 @@ class LTI_Platform
             deactivate_plugins("{$plugin_name}/{$plugin_name}.php");
             if (isset($_GET['activate'])) {
                 unset($_GET['activate']);
-            }
         }
     }
+    }
+
+    /**
+     * Check that the LTI class library is available.
+     *
+     * @since     2.0.1
+     * @return    bool    True if the library is found.
+     */
+    private function check_lti_library()
+    {
+        return class_exists('ceLTIc\LTI\Platform');
+    }
+
 }

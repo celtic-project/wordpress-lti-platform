@@ -60,15 +60,7 @@ function lti_platform_delete_tools($post_type)
 }
 
 // Check if data should be deleted on uninstall
-if (is_multisite()) {
-    $options = get_site_option(LTI_Platform::get_settings_name(), array());
-} else {
-    $options = get_option(LTI_Platform::get_settings_name(), array());
-}
-if (!is_array($options)) {
-    $options = array();
-}
-if (!empty($options['uninstall']) && ($options['uninstall'] === 'true')) {
+if (LTI_Platform::getOption('uninstall', 'false') === 'true') {
     // Delete plugin options.
     $plugin_name = LTI_Platform::get_settings_name();
     delete_option($plugin_name);
