@@ -316,7 +316,8 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
                     $tool = LTI_Platform_Tool::fromRecordId(intval($id), LTI_Platform::$ltiPlatformDataConnector);
                     if ($tool->canBeEnabled()) {
                         $tool->enabled = true;
-                        $ok = $ok && $tool->save(true);
+                        $tool->showMessages = false;
+                        $ok = $ok && $tool->save();
                     } elseif (!$denied) {
                         $ok = false;
                         $denied = true;
@@ -332,7 +333,8 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
                 foreach ($ids as $id) {
                     $tool = LTI_Platform_Tool::fromRecordId(intval($id), LTI_Platform::$ltiPlatformDataConnector);
                     $tool->enabled = false;
-                    $ok = $ok && $tool->save(true);
+                    $tool->showMessages = false;
+                    $ok = $ok && $tool->save();
                 }
                 if ($ok) {
                     add_action('all_admin_notices', array($this, 'disable_notice_success'));

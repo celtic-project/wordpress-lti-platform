@@ -547,10 +547,10 @@ class LTI_Platform_Admin
         $tool->jku = sanitize_text_field($_POST['jwksurl']);
         $tool->rsaKey = sanitize_textarea_field($_POST['publickey']);
         if (empty($tool->initiateLoginUrl) || empty($tool->redirectionUris)) {
-            $tool->ltiVersion = Util::LTI_VERSION1;
+            $tool->ltiVersion = LTI_Platform::get_lti_version(false);
             $tool->signatureMethod = 'HMAC-SHA1';
         } else {
-            $tool->ltiVersion = Util::LTI_VERSION1P3;
+            $tool->ltiVersion = LTI_Platform::get_lti_version(true);
             $tool->signatureMethod = 'RS256';
         }
         $tool->save();

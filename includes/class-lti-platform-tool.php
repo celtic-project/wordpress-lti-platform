@@ -90,7 +90,15 @@ class LTI_Platform_Tool extends Tool
      * @var      bool      $deleted   True when the tool is in the trash bin.
      */
     public $deleted = false;
-    private static $options = null;
+
+    /**
+     * Whether messages should be displayed.
+     *
+     * @since    2.1.0
+     * @access   public
+     * @var      bool      $showMessages   True when messages are to be displayed.
+     */
+    public $showMessages = true;
 
     /**
      * Get the LTI tool from its code.
@@ -158,11 +166,10 @@ class LTI_Platform_Tool extends Tool
      * Save the tool.
      *
      * @since    1.0.0
-     * @param    bool      $quiet     True if no messages should be displayed
      *
      * @return   bool      True if the tool was successfully saved.
      */
-    public function save($quiet = false)
+    public function save(): bool
     {
         $platform = new LTI_Platform_Platform(LTI_platform::$ltiPlatformDataConnector);
         $tools = $platform->getTools();
@@ -173,7 +180,7 @@ class LTI_Platform_Tool extends Tool
                 continue;
             } elseif ($tool->code === $this->code) {
                 $ok = false;
-                if (!$quiet) {
+                if ($this->showMessages) {
                     add_action('all_admin_notices', array($this, 'save_notice_duplicate'));
                 }
                 break;
@@ -182,16 +189,16 @@ class LTI_Platform_Tool extends Tool
         if ($ok) {
             if ($this->enabled && !$this->canBeEnabled()) {
                 $this->enabled = false;
-                if (!$quiet) {
+                if ($this->showMessages) {
                     add_action('all_admin_notices', array($this, 'save_notice_disabled'));
                 }
             }
             $ok = $this->dataConnector->saveTool($this);
             if ($ok) {
-                if (!$quiet) {
+                if ($this->showMessages) {
                     add_action('all_admin_notices', array($this, 'save_notice_success'));
                 }
-            } else if (!$quiet) {
+            } else if ($this->showMessages) {
                 add_action('all_admin_notices', array($this, 'save_notice_error'));
             }
         }

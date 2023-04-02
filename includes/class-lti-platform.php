@@ -22,6 +22,8 @@
  */
 
 use ceLTIc\LTI\Util;
+use ceLTIc\LTI\Enum\LogLevel;
+use ceLTIc\LTI\Enum\LtiVersion;
 
 /**
  * The core plugin class.
@@ -144,11 +146,7 @@ class LTI_Platform
     public function run()
     {
         if (LTI_Platform::getOption('debug', 'false') === 'true') {
-            if (function_exists('enum_exists') && enum_exists('ceLTIc\\LTI\\Enum\\LogLevel')) {
-                Util::$logLevel = LogLevel::Debug;
-            } else {
-                Util::$logLevel = Util::LOGLEVEL_DEBUG;
-            }
+            $this->set_debug_loglevel();
         }
         $this->loader->run();
     }
@@ -291,6 +289,42 @@ class LTI_Platform
     }
 
     /**
+     * Check for version 5 of the ceLTIc LTI library.
+     *
+     * @since    2.2.0
+     * @return   boolean     True if version 5 is being used
+     */
+    public static function use_lti_library_v5()
+    {
+        return function_exists('enum_exists') && enum_exists('ceLTIc\\LTI\\Enum\\LtiVersion');
+    }
+
+    /**
+     * Get LTI version constant or enum.
+     *
+     * @param    boolean     True if LTI 1.3 version is to be returned
+     *
+     * @since    2.2.0
+     * @return   LtiVersion|string     LTI version value
+     */
+    public static function get_lti_version($lti_1p3)
+    {
+        if (self::use_lti_library_v5()) {
+            if ($lti_1p3) {
+                $lti_version = LtiVersion::V1P3;
+            } else {
+                $lti_version = LtiVersion::V1;
+            }
+        } elseif ($lti_1p3) {
+            $lti_version = Util::LTI_VERSION1P3;
+        } else {
+            $lti_version = Util::LTI_VERSION1;
+        }
+
+        return $lti_version;
+    }
+
+    /**
      * Load the required dependencies for this plugin.
      *
      * Create an instance of the loader which will be used to register the hooks
@@ -333,7 +367,11 @@ class LTI_Platform
             require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-lti-platform-tool.php';
         }
         if (class_exists('ceLTIc\LTI\Platform')) {
-            require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-lti-platform-platform.php';
+            if (self::use_lti_library_v5()) {
+                require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-lti-platform-platform_v5.php';
+            } else {
+                require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-lti-platform-platform.php';
+            }
         }
 
         if (!class_exists('WP_List_Table')) {
@@ -342,7 +380,11 @@ class LTI_Platform
         require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-lti-platform-tool-list-table.php';
 
         if (class_exists('ceLTIc\LTI\DataConnector\DataConnector')) {
-            require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-lti-platform-dataconnector.php';
+            if (self::use_lti_library_v5()) {
+                require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-lti-platform-dataconnector_v5.php';
+            } else {
+                require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-lti-platform-dataconnector.php';
+            }
         }
 
         $this->loader = new LTI_Platform_Loader();
@@ -425,8 +467,8 @@ class LTI_Platform
             deactivate_plugins("{$plugin_name}/{$plugin_name}.php");
             if (isset($_GET['activate'])) {
                 unset($_GET['activate']);
+            }
         }
-    }
     }
 
     /**
@@ -438,6 +480,20 @@ class LTI_Platform
     private function check_lti_library()
     {
         return class_exists('ceLTIc\LTI\Platform');
+    }
+
+    /**
+     * Set debug level logging.
+     *
+     * @since    2.2.0
+     */
+    private function set_debug_loglevel()
+    {
+        if (self::use_lti_library_v5()) {
+            Util::$logLevel = LogLevel::Debug;
+        } else {
+            Util::$logLevel = Util::LOGLEVEL_DEBUG;
+        }
     }
 
 }

@@ -361,7 +361,7 @@ class LTI_Platform_Public
                 $roles = array_unique($roles);
                 $ltiroles = array();
                 foreach ($roles as $role) {
-                    if ($platform->ltiVersion === LTI\Util::LTI_VERSION1) {
+                    if ($platform->ltiVersion === LTI_Platform::get_lti_version(false)) {
                         switch ($role) {
                             case 'administrator':
                                 $ltiroles[] = 'urn:lti:sysrole:ims/lis/Administrator';
@@ -421,7 +421,7 @@ class LTI_Platform_Public
                     $lcname = preg_replace('/[^a-z0-9]/', '_', strtolower(trim($name)));
                     if (!empty($lcname)) {
                         $params["custom_{$lcname}"] = $value;
-                        if (($platform->ltiVersion === LTI\Util::LTI_VERSION1P3) && ($name !== $lcname)) {
+                        if (($platform->ltiVersion === LTI_Platform::get_lti_version(true)) && ($name !== $lcname)) {
                             $params["custom_{$name}"] = $value;
                         }
                     }
@@ -433,7 +433,7 @@ class LTI_Platform_Public
                     $lcname = preg_replace('/[^a-z0-9]/', '_', strtolower(trim($name)));
                     if (!empty($lcname)) {
                         $params["custom_{$lcname}"] = $value;
-                        if (($platform->ltiVersion === LTI\Util::LTI_VERSION1P3) && ($name !== $lcname)) {
+                        if (($platform->ltiVersion === LTI_Platform::get_lti_version(true)) && ($name !== $lcname)) {
                             $params["custom_{$name}"] = $value;
                         }
                     }
@@ -518,10 +518,10 @@ class LTI_Platform_Public
         $platform->kid = LTI_Platform::getOption('kid', '');
         $platform->rsaKey = LTI_Platform::getOption('privatekey', '');
         if (!LTI\Tool::$defaultTool->canUseLTI13()) {
-            $platform->ltiVersion = LTI\Util::LTI_VERSION1;
+            $platform->ltiVersion = LTI_Platform::get_lti_version(false);
             $platform->signatureMethod = 'HMAC-SHA1';
         } else {
-            $platform->ltiVersion = LTI\Util::LTI_VERSION1P3;
+            $platform->ltiVersion = LTI_Platform::get_lti_version(true);
             $platform->signatureMethod = 'RS256';
             if (LTI_Platform::getOption('storage', '') === 'true') {
                 $platform::$browserStorageFrame = '_parent';
