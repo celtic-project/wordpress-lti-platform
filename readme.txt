@@ -2,9 +2,9 @@
 Contributors: spvickers
 Tags: lti, ims, 1edtech, learning tools interoperability, celtic, platform
 Requires at least: 5.0
-Tested up to: 6.1.1
-Requires PHP: 5.6
-Stable tag: 2.1.0
+Tested up to: 6.2.2
+Requires PHP: 7.0
+Stable tag: 2.2.0
 License: GNU General Public License Version 3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
