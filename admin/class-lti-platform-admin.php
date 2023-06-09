@@ -174,26 +174,12 @@ class LTI_Platform_Admin
             }
             $options[$option] = $value;
         }
-        if (is_multisite()) {
-            update_site_option(LTI_Platform::get_settings_name(), $options);
-        } else {
-            update_option(LTI_Platform::get_settings_name(), $options);
-        }
-        add_action('all_admin_notices', 'save_network_notice_success');
-        wp_redirect("settings.php?page={$this->plugin_name}-settings");
+        update_site_option(LTI_Platform::get_settings_name(), $options);
+        add_settings_error('general', 'settings_updated', __('Settings saved.'), 'success');
+        set_transient('settings_errors', get_settings_errors(), 30);
+        wp_redirect(add_query_arg(array('page' => "{$this->plugin_name}-settings", 'settings-updated' => 'true'),
+                network_admin_url('settings.php')));
         exit;
-    }
-
-    /**
-     * Display a message when settings have been successfully saved.
-     *
-     * @since    2.0.0
-     */
-    public function save_network_notice_success()
-    {
-        echo('    <div class="notice notice-success is-dismissible">' . "\n");
-        echo('        <p>' . esc_html__('Settings updated.', $this->plugin_name) . '</p>' . "\n");
-        echo('    </div>' . "\n");
     }
 
     /**
@@ -445,7 +431,9 @@ class LTI_Platform_Admin
             return;
         }
 
-        settings_errors("{$this->plugin_name}_messages");
+        if (is_multisite()) {
+            settings_errors();
+        }
 
         require_once(plugin_dir_path(dirname(__FILE__)) . 'admin/partials/lti-platform-admin-settings.php');
     }

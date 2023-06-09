@@ -43,7 +43,6 @@ echo('    ' . esc_html__('LTI Platform Settings', LTI_Platform::get_plugin_name(
 echo('    <a href="' . esc_url($page . '?page=' . LTI_Platform::get_plugin_name()) . '" class="page-title-action">LTI Tools List</a>' . "\n");
 echo('  </h1>' . "\n");
 echo('  <form action="' . esc_url($url) . '" method="post">' . "\n");
-do_action('all_admin_notices');
 
 submit_button(null, 'primary', 'submit', true, array('id' => 'submit_top'));
 settings_fields(LTI_Platform::get_plugin_name());
