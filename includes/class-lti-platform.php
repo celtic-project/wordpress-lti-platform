@@ -419,7 +419,9 @@ class LTI_Platform
 
         $this->loader->add_action('admin_init', $plugin_admin, 'settings_init');
         $this->loader->add_action('admin_menu', $plugin_admin, 'options_page');
-        $this->loader->add_action('network_admin_menu', $plugin_admin, 'network_options_page');
+        if (is_multisite()) {
+            $this->loader->add_action('network_admin_menu', $plugin_admin, 'network_options_page');
+        }
 
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
 
