@@ -1,6 +1,6 @@
 === LTI Platform ===
 Contributors: spvickers
-Tags: lti, ims, 1edtech, learning tools interoperability, celtic, platform
+Tags: lti, 1edtech, learning tools interoperability, celtic, platform
 Requires at least: 5.0
 Tested up to: 6.5
 Requires PHP: 7.0
