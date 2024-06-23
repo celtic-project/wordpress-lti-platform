@@ -33,6 +33,7 @@
  * @author     Stephen P Vickers <stephen@spvsoftwareproducts.com>
  */
 use ceLTIc\LTI\Platform;
+use ceLTIc\LTI\Tool;
 use ceLTIc\LTI\Content;
 use ceLTIc\LTI\Util;
 
@@ -61,6 +62,7 @@ class LTI_Platform_Platform extends Platform
         $ltiMessageHint = null;
         $user = wp_get_current_user();
         $data = array(
+            'messageUrl' => $url,
             'login_hint' => $loginHint,
             'params' => $params
         );
@@ -81,6 +83,7 @@ class LTI_Platform_Platform extends Platform
             $this->ok = false;
             $this->messageParameters['error'] = 'access_denied';
         } else {
+            Tool::$defaultTool->messageUrl = $login['messageUrl'];
             $this->messageParameters = $login['params'];
         }
     }
