@@ -380,7 +380,7 @@ class LTI_Platform_Tool extends Tool
         }
         if (empty($error)) {
             $target = (!empty($atts['target'])) ? $atts['target'] : $tool->getSetting('presentationTarget');
-            if (!in_array($target, array('window', 'popup', 'iframe', 'embed'))) {
+            if (!in_array($target, array('window', 'popup', 'iframe', 'embed', 'urlonly'))) {
                 $error = 'Invalid presentation target: ' . $target;
             }
         }
@@ -444,6 +444,9 @@ class LTI_Platform_Tool extends Tool
                     break;
                 case 'embed':
                     $html = "{$content}</p><div><iframe style=\"border: none;{$size}\" class=\"\" src=\"{$url}\" allowfullscreen></iframe></div><p>";
+                    break;
+                case 'urlonly':
+                    $html = "$url";
                     break;
             }
         } else {
