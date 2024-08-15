@@ -208,7 +208,7 @@ echo('          <td>' . "\n");
 echo('            <select id="id_presentationtarget" aria-required="true" name="presentationtarget">' . "\n");
 echo('              <option value="window"' . selected($tool->getSetting('presentationTarget') === 'window', true, false) . '>' . esc_html__('New window',
     LTI_Platform::get_plugin_name()) . '</option>' . "\n");
-echo('              <option value="urlonly"' . selected($tool->getSetting('presentationTarget') === 'urlonly', true, false) . '>' . esc_html__('URL only',
+echo('              <option value="urlonly"' . selected($tool->getSetting('presentationTarget'), 'urlonly', true, false) . '>' . esc_html__('URL only',
     LTI_Platform::get_plugin_name()) . '</option>' . "\n");
 echo('              <option value="popup"' . selected($tool->getSetting('presentationTarget'), 'popup', true, false) . '>' . esc_html__('Popup window',
     LTI_Platform::get_plugin_name()) . '</option>' . "\n");
