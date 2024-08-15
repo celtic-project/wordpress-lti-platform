@@ -266,7 +266,7 @@ class LTI_Platform_Public
         }
         if ($ok) {
             $target = (!empty($link_atts['target'])) ? $link_atts['target'] : $tool->getSetting('presentationTarget', 'window');
-            $ok = in_array($target, array('window', 'popup', 'iframe', 'embed'));
+            $ok = in_array($target, array('window', 'popup', 'iframe', 'embed', 'urlonly'));
             if (!$ok) {
                 $reason = __('Invalid target specified', LTI_Platform::get_plugin_name());
             }
@@ -315,7 +315,7 @@ class LTI_Platform_Public
                 $msg = 'ContentItemSelectionRequest';
                 $params['accept_media_types'] = 'application/vnd.ims.lti.v1.ltilink,*/*';
                 $params['accept_multiple'] = 'false';
-                $params['accept_presentation_document_targets'] = 'embed,frame,iframe,window,popup';
+                $params['accept_presentation_document_targets'] = 'embed,frame,iframe,window,popup,urlonly';
                 $params['content_item_return_url'] = get_option('siteurl') . '/?' . LTI_Platform::get_plugin_name() . '&content&tool=' . urlencode($link_atts['tool']);
             }
             if (($target === 'popup') || ($target === 'iframe') || ($target === 'embed')) {

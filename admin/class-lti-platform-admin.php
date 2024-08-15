@@ -414,6 +414,7 @@ class LTI_Platform_Admin
         $target = LTI_Platform::getOption($args['name'], '');
         echo('<select id="' . esc_attr($args['label_for']) . '" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . ']">' . "\n");
         echo('  <option value="window"' . selected($target === 'window', true, false) . '>New window</option>' . "\n");
+        echo('  <option value="urlonly"' . selected($target === 'urlonly', true, false) . '>URL only</option>' . "\n");
         echo('  <option value="popup"' . selected($target === 'popup', true, false) . '>Pop-up window</option>' . "\n");
         echo('  <option value="iframe"' . selected($target === 'iframe', true, false) . '>iFrame</option>' . "\n");
         echo('  <option value="embed"' . selected($target === 'embed', true, false) . '>Embed</option>' . "\n");
