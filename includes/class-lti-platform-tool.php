@@ -154,6 +154,8 @@ class LTI_Platform_Tool extends Tool
         $this->setSetting('presentationTarget', LTI_Platform::getOption('presentationtarget', ''));
         $this->setSetting('presentationWidth', LTI_Platform::getOption('presentationwidth', ''));
         $this->setSetting('presentationHeight', LTI_Platform::getOption('presentationheight', ''));
+        $this->setSetting('presentationClass', '');
+        $this->setSetting('presentationStyle', '');
         $options = LTI_Platform::getOptions();
         foreach ($options as $name => $value) {
             if (strpos($name, 'role_') === 0) {
@@ -353,10 +355,13 @@ class LTI_Platform_Tool extends Tool
         $atts = shortcode_atts(array(
             'tool' => '',
             'id' => '',
+            'title' => '',
             'custom' => '',
             'target' => '',
             'width' => '',
-            'height' => ''), $atts);
+            'height' => '',
+            'class' => '',
+            'style' => ''), $atts, LTI_Platform::get_plugin_name());
 
         $error = '';
         $missing = array();
@@ -431,16 +436,52 @@ class LTI_Platform_Tool extends Tool
             }
             $url = add_query_arg(array(LTI_Platform::get_plugin_name() => '', 'post' => $post->ID, 'id' => $atts['id']),
                 get_site_url());
+            $classes = array();
+            if (!empty($tool->getSetting('presentationClass'))) {
+                $classes = explode(' ', $tool->getSetting('presentationClass'));
+            }
+            if (!empty($atts['class'])) {
+                $classes = array_merge($classes, explode(' ', $atts['class']));
+            }
+            $class = '';
+            if (!empty($classes)) {
+                $classes = array_unique($classes);
+                $classes = array_map('trim', $classes);
+                $class = ' class="' . implode(' ', $classes) . '"';
+            }
+            $styles = array();
+            if (!empty($tool->getSetting('presentationStyle'))) {
+                preg_match_all("/([^;: ]+) *: *([^;:]+)/", $tool->getSetting('presentationStyle'), $elements);
+                $styles = array_combine($elements[1], $elements[2]);
+            }
+            if (!empty($atts['style'])) {
+                preg_match_all("/([^;: ]+) *: *([^;:]+)/", $atts['style'], $elements);
+                $styles = array_merge($styles, array_combine($elements[1], $elements[2]));
+            }
+            $style = '';
+            if (!empty($styles)) {
+                $style = ' style="';
+                foreach ($styles as $name => $value) {
+                    $style .= "{$name}: {$value}; ";
+                }
+                $style = trim($style) . '"';
+            }
             switch ($target) {
                 case 'window':
-                    $html = "<a href=\"{$url}\" title=\"Launch {$atts['tool']} tool\" target=\"_blank\">{$link_text}</a>";
+                        $title = (empty($atts['title'])) ? "Launch {$atts['tool']} tool" : $atts['title'];
+                        $title = str_replace('"', '&quot;', $title);
+                        $html = "<a href=\"{$url}\"{$class}{$style} title=\"{$title}\" target=\"_blank\">{$link_text}</a>";
                     break;
                 case 'popup':
-                    $html = "<a href=\"#\" title=\"Launch {$atts['tool']} tool\" onclick=\"window.open('{$url}', '', '{$size}'); return false;\">{$link_text}</a>";
+                        $title = (empty($atts['title'])) ? "Launch {$atts['tool']} tool" : $atts['title'];
+                        $title = str_replace('"', '&quot;', $title);
+                        $html = "<a href=\"#\" title=\"{$title}\" onclick=\"window.open('{$url}', '', '{$size}'); return false;\">{$link_text}</a>";
                     break;
                 case 'iframe':
                     $url = add_query_arg(array('embed' => ''), $url);
-                    $html = "<a href=\"{$url}\" title=\"Embed {$atts['tool']} tool\">{$link_text}</a>";
+                        $title = (empty($atts['title'])) ? "Embed {$atts['tool']} tool" : $atts['title'];
+                        $title = str_replace('"', '&quot;', $title);
+                        $html = "<a href=\"{$url}\" title=\"{$title}\">{$link_text}</a>";
                     break;
                 case 'embed':
                     $html = "{$content}</p><div><iframe style=\"border: none;{$size}\" class=\"\" src=\"{$url}\" allowfullscreen></iframe></div><p>";

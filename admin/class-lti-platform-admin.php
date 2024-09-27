@@ -297,6 +297,12 @@ class LTI_Platform_Admin
         add_settings_field('field_height', __('Height of pop-up window or iframe', $this->plugin_name), array($this, 'field_text'),
             $this->plugin_name, 'section_presentation',
             array('label_for' => 'id_presentationheight', 'name' => 'presentationheight', 'class' => 'small-text'));
+        add_settings_field('field_class', __('Classes for launch link element', $this->plugin_name), array($this, 'field_text'),
+            $this->plugin_name, 'section_presentation',
+            array('label_for' => 'id_presentationclass', 'name' => 'presentationclass', 'class' => 'large-text'));
+        add_settings_field('field_style', __('Styles for launch link element', $this->plugin_name), array($this, 'field_text'),
+            $this->plugin_name, 'section_presentation',
+            array('label_for' => 'id_presentationstyle', 'name' => 'presentationstyle', 'class' => 'large-text'));
 
         add_settings_section(
             'section_security', __('Security Settings', $this->plugin_name), array($this, 'section_security'), $this->plugin_name
@@ -544,6 +550,10 @@ class LTI_Platform_Admin
                 (!empty($_POST['presentationwidth'])) ? sanitize_text_field(wp_unslash($_POST['presentationwidth'])) : null);
             $tool->setSetting('presentationHeight',
                 (!empty($_POST['presentationheight'])) ? sanitize_text_field(wp_unslash($_POST['presentationheight'])) : null);
+            $tool->setSetting('presentationClass',
+                (!empty($_POST['presentationclass'])) ? sanitize_text_field(wp_unslash($_POST['presentationclass'])) : null);
+            $tool->setSetting('presentationStyle',
+                (!empty($_POST['presentationstyle'])) ? sanitize_text_field(wp_unslash($_POST['presentationstyle'])) : null);
             $tool->messageUrl = (!empty($_POST['messageurl'])) ? esc_url_raw(wp_unslash($_POST['messageurl'])) : null;
             $tool->useContentItem = !empty($_POST['usecontentitem']) && (sanitize_text_field(wp_unslash($_POST['usecontentitem'])) === 'true');
             $tool->contentItemUrl = (!empty($_POST['contentitemurl'])) ? esc_url_raw(wp_unslash($_POST['contentitemurl'])) : null;

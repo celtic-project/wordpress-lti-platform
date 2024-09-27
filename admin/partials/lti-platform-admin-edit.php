@@ -34,8 +34,12 @@ wp_enqueue_script('wp-ajax-response');
 
 if (empty($tool->getRecordId())) {
     $verb = 'Add New';
+    $defaultclass = LTI_Platform::getOption('presentationclass', '');
+    $defaultstyle = LTI_Platform::getOption('presentationstyle', '');
 } else {
     $verb = 'Edit';
+    $defaultclass = '';
+    $defaultstyle = '';
 }
 if (defined('WP_NETWORK_ADMIN') && WP_NETWORK_ADMIN) {
     $page = 'settings.php';
@@ -235,6 +239,28 @@ echo('            </label>' . "\n");
 echo('          </th>' . "\n");
 echo('          <td>' . "\n");
 echo('            <input id="id_presentationheight" type="text" aria-required="false" value="' . esc_attr($tool->getSetting('presentationHeight')) . '" name="presentationheight" class="small-text">' . "\n");
+echo('          </td>' . "\n");
+echo('        </tr>' . "\n");
+echo('        <tr>' . "\n");
+echo('          <th scope="row">' . "\n");
+echo('            <label for="id_presentationclass">' . "\n");
+echo('              ' . esc_html__('Classes of launch link element', LTI_Platform::get_plugin_name()) . "\n");
+echo('            </label>' . "\n");
+echo('          </th>' . "\n");
+echo('          <td>' . "\n");
+echo('            <input id="id_presentationclass" type="text" aria-required="false" value="' . esc_attr($tool->getSetting('presentationClass',
+        $defaultclass)) . '" name="presentationclass" class="large-text">' . "\n");
+echo('          </td>' . "\n");
+echo('        </tr>' . "\n");
+echo('        <tr>' . "\n");
+echo('          <th scope="row">' . "\n");
+echo('            <label for="id_presentationstyle">' . "\n");
+echo('              ' . esc_html__('Styles of launch link element', LTI_Platform::get_plugin_name()) . "\n");
+echo('            </label>' . "\n");
+echo('          </th>' . "\n");
+echo('          <td>' . "\n");
+echo('            <input id="id_presentationstyle" type="text" aria-required="false" value="' . esc_attr($tool->getSetting('presentationStyle',
+        $defaultstyle)) . '" name="presentationstyle" class="large-text">' . "\n");
 echo('          </td>' . "\n");
 echo('        </tr>' . "\n");
 echo('      </tbody>' . "\n");
