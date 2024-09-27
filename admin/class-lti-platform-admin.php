@@ -258,7 +258,8 @@ class LTI_Platform_Admin
         add_settings_field('field_uninstall', __('Delete data on uninstall?', $this->plugin_name), array($this, 'field_checkbox'),
             $this->plugin_name, 'section_general', array('label_for' => 'id_uninstall', 'name' => 'uninstall'));
         add_settings_field('field_platformguid', __('Platform GUID', $this->plugin_name), array($this, 'field_text'),
-            $this->plugin_name, 'section_general', array('label_for' => 'id_platformguid', 'name' => 'platformguid'));
+            $this->plugin_name, 'section_general',
+            array('label_for' => 'id_platformguid', 'name' => 'platformguid', 'class' => 'regular-text'));
 
         add_settings_section(
             'section_privacy', __('Privacy Settings', $this->plugin_name), array($this, 'section_privacy'), $this->plugin_name
@@ -291,16 +292,17 @@ class LTI_Platform_Admin
             $this->plugin_name, 'section_presentation',
             array('label_for' => 'id_presentationtarget', 'name' => 'presentationtarget'));
         add_settings_field('field_width', __('Width of pop-up window or iframe', $this->plugin_name), array($this, 'field_text'),
-            $this->plugin_name, 'section_presentation', array('label_for' => 'id_presentationwidth', 'name' => 'presentationwidth'));
+            $this->plugin_name, 'section_presentation',
+            array('label_for' => 'id_presentationwidth', 'name' => 'presentationwidth', 'class' => 'small-text'));
         add_settings_field('field_height', __('Height of pop-up window or iframe', $this->plugin_name), array($this, 'field_text'),
             $this->plugin_name, 'section_presentation',
-            array('label_for' => 'id_presentationheight', 'name' => 'presentationheight'));
+            array('label_for' => 'id_presentationheight', 'name' => 'presentationheight', 'class' => 'small-text'));
 
         add_settings_section(
             'section_security', __('Security Settings', $this->plugin_name), array($this, 'section_security'), $this->plugin_name
         );
         add_settings_field('field_kid', __('Key ID', $this->plugin_name), array($this, 'field_text'), $this->plugin_name,
-            'section_security', array('label_for' => 'id_kid', 'name' => 'kid'));
+            'section_security', array('label_for' => 'id_kid', 'name' => 'kid', 'class' => 'regular-text'));
         add_settings_field('field_privatekey', __('Private key', $this->plugin_name), array($this, 'field_textarea'),
             $this->plugin_name, 'section_security',
             array('label_for' => 'id_privatekey', 'name' => 'privatekey', 'rows' => '10', 'cols' => '65'));
@@ -379,7 +381,7 @@ class LTI_Platform_Admin
     public function field_text($args)
     {
         $text = LTI_Platform::getOption($args['name'], '');
-        echo('<input id="' . esc_attr($args['label_for']) . '" type="text" aria-required="false" value="');
+        echo('<input id="' . esc_attr($args['label_for']) . '" type="text" class="' . esc_attr($args['class']) . '" aria-required="false" value="');
         echo(esc_attr($text));
         echo('" name="' . esc_attr(LTI_Platform::get_settings_name()) . '[' . esc_attr($args['name']) . ']">' . "\n");
     }
@@ -392,7 +394,7 @@ class LTI_Platform_Admin
     public function field_textarea($args)
     {
         $textarea = LTI_Platform::getOption($args['name'], '');
-        echo('<textarea id=" ' . esc_attr($args['label_for']) . '" name="' . esc_attr(LTI_Platform::get_settings_name()) . '[' . esc_attr($args['name']) . ']" class="code" rows="' . esc_attr($args['rows']) . '" cols="' . esc_attr($args['cols']) . '">');
+        echo('<textarea id=" ' . esc_attr($args['label_for']) . '" class="code large-text" name="' . esc_attr(LTI_Platform::get_settings_name()) . '[' . esc_attr($args['name']) . ']" class="code" rows="' . esc_attr($args['rows']) . '" cols="' . esc_attr($args['cols']) . '">');
         echo(esc_textarea($textarea));
         echo('</textarea>' . "\n");
     }

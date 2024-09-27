@@ -204,8 +204,7 @@ class LTI_Platform_Public
             if (!empty($height)) {
                 $size .= " height: {$height};";
             }
-            $size = esc_attr($size);
-            echo('            <iframe style="border: none; overflow: scroll;' . esc_attr($size) . '" class="" src="' . esc_attr($url) . '" allowfullscreen></iframe>');
+            echo('            <iframe style="border: none; overflow: scroll;' . esc_attr($size) . '" src="' . esc_attr($url) . '" allowfullscreen></iframe>');
         } else {
             $message = __('Sorry, the LTI tool could not be launched.', LTI_Platform::get_plugin_name());
             if (!empty($reason)) {
