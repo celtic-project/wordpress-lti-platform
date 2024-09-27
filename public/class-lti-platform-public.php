@@ -92,13 +92,15 @@ class LTI_Platform_Public
                 $allowed = array('div' => array('class' => true), 'h2' => array(), 'p' => array(), 'br' => array(), 'input' => array('type' => true, 'name' => true, 'class' => true, 'value' => true, 'toolname' => true), 'button' => array('class' => true, 'id' => true, 'disabled' => true));
                 echo(wp_kses($this->get_tools_list(), $allowed));
             } else if (isset($_GET['usecontentitem'])) {
+                if (!empty($_GET['tool'])) {
                 header('Content-type: application/json; charset=UTF-8');
-                echo(json_encode($this->get_tool(sanitize_text_field($_GET['tool']))));
+                    echo(wp_json_encode($this->get_tool(sanitize_text_field(wp_unslash($_GET['tool'])))));
+                }
             } else if (isset($_GET['keys'])) {
                 $jwt = LTI\Jwt\Jwt::getJwtClient();
                 $keys = $jwt::getJWKS(LTI_Platform::getOption('privatekey', ''), 'RS256', LTI_Platform::getOption('kid', ''));
                 header('Content-type: application/json; charset=UTF-8');
-                echo(json_encode($keys));
+                echo(wp_json_encode($keys));
             } else if (isset($_GET['auth'])) {
                 $this->handleRequest();
             } else if (isset($_GET['storagejs'])) {
@@ -107,7 +109,7 @@ class LTI_Platform_Public
             } else if (isset($_GET['embed'])) {
                 $this->renderTool();
             } else if (isset($_GET['content'])) {
-                $this->content(sanitize_text_field($_GET['tool']));
+                $this->content(sanitize_text_field(wp_unslash($_GET['tool'])));
             } else if (isset($_GET['deeplink'])) {
                 $this->message(true);
             } else if (isset($_GET['post'])) {
@@ -126,7 +128,8 @@ class LTI_Platform_Public
     {
         $ok = !empty($_REQUEST['client_id']);
         if ($ok) {
-            $tool = LTI_Platform_Tool::fromCode(sanitize_text_field($_REQUEST['client_id']), LTI_Platform::$ltiPlatformDataConnector);
+            $tool = LTI_Platform_Tool::fromCode(sanitize_text_field(wp_unslash($_REQUEST['client_id'])),
+                    LTI_Platform::$ltiPlatformDataConnector);
             $ok = !empty($tool->created);
         }
         if ($ok) {
@@ -150,8 +153,11 @@ class LTI_Platform_Public
         get_header();
         echo('		<div id="primary" class="content-area">' . "\n");
         echo('          <div id="content" class="site-content" role="main">' . "\n");
-        $post = $this->get_post(intval(sanitize_text_field($_GET['post'])));
+        $ok = !empty($_GET['post']);
+        if ($ok) {
+            $post = $this->get_post(intval(sanitize_text_field(wp_unslash($_GET['post']))));
         $ok = !empty($post);
+        }
         if (!$ok) {
             $reason = 'Missing or invalid post attribute in link';
         } else {
@@ -161,7 +167,7 @@ class LTI_Platform_Public
             }
         }
         if ($ok) {
-            $link_atts = $this->get_link_atts($post, sanitize_text_field($_GET['id']));
+            $link_atts = $this->get_link_atts($post, sanitize_text_field(wp_unslash($_GET['id'])));
             $ok = !empty($link_atts['tool']);
             if (!$ok) {
                 $reason = 'No tool specified';
@@ -226,8 +232,11 @@ class LTI_Platform_Public
     {
         $debug = false;
         $reason = null;
-        $post = $this->get_post(intval(sanitize_text_field($_GET['post'])));
+        $ok = !empty($_GET['post']);
+        if ($ok) {
+            $post = $this->get_post(intval(sanitize_text_field(wp_unslash($_GET['post']))));
         $ok = !empty($post);
+        }
         if (!$ok) {
             $reason = __('Missing or invalid post attribute in link', LTI_Platform::get_plugin_name());
         } else if (!$deeplink) {
@@ -238,7 +247,7 @@ class LTI_Platform_Public
         }
         if ($ok) {
             if (!$deeplink) {
-                $link_atts = $this->get_link_atts($post, sanitize_text_field($_GET['id']));
+                $link_atts = $this->get_link_atts($post, sanitize_text_field(wp_unslash($_GET['id'])));
                 $ok = !empty($link_atts['tool']);
                 if (!$ok) {
                     $reason = __('No tool specified', LTI_Platform::get_plugin_name());
@@ -247,7 +256,7 @@ class LTI_Platform_Public
                 $ok = false;
                 $reason = __('Missing tool attribute in link', LTI_Platform::get_plugin_name());
             } else {
-                $link_atts['tool'] = sanitize_text_field($_GET['tool']);
+                $link_atts['tool'] = sanitize_text_field(wp_unslash($_GET['tool']));
             }
         }
         if ($ok) {
@@ -415,11 +424,17 @@ class LTI_Platform_Public
             }
             $custom = array();
             if (!empty($link_atts['custom'])) {
-                $decoded = html_entity_decode($link_atts['custom']);
-                parse_str(str_replace(';', '&', $decoded), $custom);
+                $custom = $link_atts['custom'];
+                $ampersand = $this->getSubstituteString($custom);
+                $custom = str_replace('&', $ampersand, $custom);
+                $semicolon = $this->getSubstituteString($custom);
+                $custom = str_replace('\\;', $semicolon, $custom);
+                parse_str(str_replace(';', '&', $custom), $custom);
                 foreach ($custom as $name => $value) {
                     $lcname = preg_replace('/[^a-z0-9]/', '_', strtolower(trim($name)));
                     if (!empty($lcname)) {
+                        $value = str_replace($ampersand, '&', $value);
+                        $value = str_replace($semicolon, ';', $value);
                         $params["custom_{$lcname}"] = $value;
                         if (($platform->ltiVersion === LTI_Platform::get_lti_version(true)) && ($name !== $lcname)) {
                             $params["custom_{$name}"] = $value;
@@ -482,7 +497,17 @@ class LTI_Platform_Public
         if (preg_match_all("/{$pattern}/", $post->post_content, $shortcodes, PREG_SET_ORDER) !== false) {
             $link_text = '';
             foreach ($shortcodes as $shortcode) {
-                $atts = shortcode_parse_atts($shortcode[3]);
+                $atts = $shortcode[3];
+                $semicolon = $this->getSubstituteString($atts);
+                $atts = str_replace('\\;', $semicolon, $atts);
+                $doublequote = $this->getSubstituteString($atts);
+                $atts = str_replace('\\"', $doublequote, $atts);
+                $atts = shortcode_parse_atts($atts);
+                foreach ($atts as $key => $value) {
+                    $value = str_replace($semicolon, '\\;', $value);
+                    $value = str_replace($doublequote, '\\"', $value);
+                    $atts[$key] = $value;
+                }
                 if (!empty($atts['id']) && ($atts['id'] === $id)) {
                     if (empty($link_atts)) {
                         $link_atts = $atts;
@@ -642,6 +667,7 @@ EOD;
                 $attr .= static::setAttribute('title', $item->title);
                 $linktext = $item->title;
             }
+            $linktext = str_replace('\'', '\\\'', $linktext);
             if (!empty($item->url)) {
                 $attr .= static::setAttribute('url', $item->url);
             }
@@ -660,13 +686,17 @@ EOD;
             if (!empty($item->custom)) {
                 $attr .= static::setAttribute('custom', $item->custom);
             }
+            $attr = str_replace('\\', '\\\\', $attr);
+            $attr = str_replace('\'', '\\\'', $attr);
             $plugin_name = LTI_Platform::get_plugin_name();
             $html .= <<< EOD
       if (!wdw.LtiPlatformText) {
         wdw.LtiPlatformText = '{$linktext}';
       }
-      var id = Math.random().toString(16).substr(2, 8);
-      wdw.LtiPlatformProps.onChange(wdw.wp.richText.insert(wdw.LtiPlatformProps.value, '[{$plugin_name} {$attr}]' + wdw.LtiPlatformText + '[/{$plugin_name}]'));
+      var shortcode = wdw.wp.richText.create({
+        html: '[{$plugin_name} {$attr}]' + wdw.LtiPlatformText + '[/{$plugin_name}]'
+      });
+      wdw.LtiPlatformProps.onChange(wdw.wp.richText.insert(wdw.LtiPlatformProps.value, shortcode));
       wdw.LtiPlatformProps.onFocus();
       window.close();
 
@@ -690,6 +720,15 @@ EOD;
         echo wp_kses($html, $allowed);
     }
 
+    private function getSubstituteString($str)
+    {
+        do {
+            $sub = '{' . LTI\Util::getRandomString() . '}';
+        } while (strpos($str, $sub) !== false);
+
+        return $sub;
+    }
+
     /**
      * Get the entry for a shortcode attribute.
      *
@@ -705,11 +744,13 @@ EOD;
                 $attr = $value;
             } else {
                 foreach ($value as $key => $val) {
+                    $val = str_replace(';', '\\;', $val);
                     $attr .= "{$key}={$val};";
                 }
                 $attr = substr($attr, 0, -1);
             }
             if (strpos($attr, ' ') !== false) {
+                $attr = str_replace('"', '\\"', $attr);
                 $attr = '"' . $attr . '"';
             }
             $attr = " {$name}={$attr}";

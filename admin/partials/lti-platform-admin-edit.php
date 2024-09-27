@@ -47,7 +47,7 @@ $url = add_query_arg(array('page' => LTI_Platform::get_plugin_name() . '-edit', 
 echo('<div class="wrap">' . "\n");
 echo('  <h1>' . "\n");
 echo('    ' . esc_html($verb) . ' LTI Tool' . "\n");
-echo('    <a href="' . esc_attr($page) . '?page=' . LTI_Platform::get_plugin_name() . '" class="page-title-action">LTI Tools List</a>' . "\n");
+echo('    <a href="' . esc_attr($page) . '?page=' . esc_attr(LTI_Platform::get_plugin_name()) . '" class="page-title-action">LTI Tools List</a>' . "\n");
 echo('  </h1>' . "\n");
 echo('  <form action="' . esc_url($url) . '" name="a" id="a" method="post" class="validate" novalidate="novalidate">' . "\n");
 wp_nonce_field(LTI_Platform::get_plugin_name() . '-nonce');
@@ -62,8 +62,7 @@ echo('        <tr class="form-field form-required">' . "\n");
 echo('          <th scope="row">' . "\n");
 echo('            <label for="id_name">' . "\n");
 echo('              ' . esc_html__('Name', LTI_Platform::get_plugin_name()) . "\n");
-echo('              <span class="description">' . esc_html__('(required)', LTI_Platform::get_plugin_name(),
-    LTI_Platform::get_plugin_name()) . '</span>' . "\n");
+echo('              <span class="description">' . esc_html__('(required)', LTI_Platform::get_plugin_name()) . '</span>' . "\n");
 echo('            </label>' . "\n");
 echo('          </th>' . "\n");
 echo('          <td>' . "\n");
@@ -160,7 +159,8 @@ echo('      </tbody>' . "\n");
 echo('    </table>' . "\n");
 echo('' . "\n");
 echo('    <h2>' . esc_html__('Role Mappings', LTI_Platform::get_plugin_name()) . '</h2>' . "\n");
-echo '    <p>' . __('Select the LTI role(s) to be passed to this tool for each WordPress role.', LTI_Platform::get_plugin_name()) . "</p>\n";
+echo '    <p>' . esc_html__('Select the LTI role(s) to be passed to this tool for each WordPress role.',
+    LTI_Platform::get_plugin_name()) . "</p>\n";
 echo('' . "\n");
 echo('    <table class="form-table">' . "\n");
 echo('      <tbody>' . "\n");
@@ -357,7 +357,7 @@ echo('          </th>' . "\n");
 echo('          <td>' . "\n");
 echo('            <textarea id="id_redirectionuris" name="redirectionuris" class="regular-text">');
 if (is_array($tool->redirectionUris)) {
-    echo(esc_html(implode("\r\n", $tool->redirectionUris)));
+    echo(esc_textarea(implode("\r\n", $tool->redirectionUris)));
 }
 echo('</textarea>' . "\n");
 echo('          </td>' . "\n");

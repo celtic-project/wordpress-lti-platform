@@ -3,12 +3,12 @@
   Plugin Name: LTI Platform
   Plugin URI: http://www.spvsoftwareproducts.com/php/wordpress-lti-platform/
   Description: This plugin allows WordPress to act as a Platform using the 1EdTech (formerly) IMS Learning Tools Interoperability (LTI) specification.
-  Version: 2.2.1
+  Version: 2.3.0
   Requires at least: 5.0
   Requires PHP: 7.0
   Author: Stephen P Vickers
   Author URI: http://www.celtic-project.org/
-  License: GPL3
+  License: GPLv3
  */
 
 /*

@@ -78,7 +78,8 @@ class LTI_Platform_Admin
             wp_enqueue_script("{$this->plugin_name}-post", plugin_dir_url(__FILE__) . 'js/lti-platform-post.js',
                 array('wp-element', 'wp-editor', 'wp-rich-text'), $this->version, false);
         } elseif (($hook === "settings_page_{$this->plugin_name}-settings") || ($hook === "settings_page_{$this->plugin_name}-edit")) {
-            wp_enqueue_script("{$this->plugin_name}-settings", plugin_dir_url(__FILE__) . 'js/lti-platform-settings.js');
+            wp_enqueue_script("{$this->plugin_name}-settings", plugin_dir_url(__FILE__) . 'js/lti-platform-settings.js', array(),
+                $this->version, false);
         }
     }
 
@@ -152,31 +153,41 @@ class LTI_Platform_Admin
      */
     public function save_network_options()
     {
-        $rawoptions = $_POST[LTI_Platform::get_settings_name()];
-        $options = array();
-        foreach ($rawoptions as $option => $value) {
-            $option = sanitize_text_field($option);
-            switch ($option) {
-                case 'privatekey':
-                    $value = sanitize_textarea_field($value);
-                    break;
-                default:
-                    if (!is_array($value)) {
-                        $value = sanitize_text_field($value);
-                    } else {
-                        $arr = $value;
-                        $value = array();
-                        foreach ($arr as $item) {
-                            $value[] = sanitize_text_field($item);
-                        }
-                    }
-                    break;
-            }
-            $options[$option] = $value;
+        $nonce = null;
+        if (isset($_REQUEST['_wpnonce'])) {
+            $nonce = sanitize_text_field(wp_unslash($_REQUEST['_wpnonce']));
         }
-        update_site_option(LTI_Platform::get_settings_name(), $options);
-        add_settings_error('general', 'settings_updated', __('Settings saved.'), 'success');
-        set_transient('settings_errors', get_settings_errors(), 30);
+        $ok = (empty($nonce) || !wp_verify_nonce($nonce, "{$this->plugin_name}-nonce"));
+        if ($ok && isset($_POST[LTI_Platform::get_settings_name()]) &&
+            is_array($_POST[LTI_Platform::get_settings_name()])) {
+            $rawoptions = $_POST[LTI_Platform::get_settings_name()];
+            $options = array();
+            foreach ($rawoptions as $option => $value) {
+                switch ($option) {
+                    case 'privatekey':
+                        $value = sanitize_textarea_field(wp_unslash($value));
+                        break;
+                    default:
+                        if (!is_array($value)) {
+                            $value = sanitize_text_field(wp_unslash($value));
+                        } else {
+                            $arr = $value;
+                            $value = array();
+                            foreach ($arr as $item) {
+                                $value[] = sanitize_text_field(wp_unslash($item));
+                            }
+                        }
+                        break;
+                }
+                $options[$option] = $value;
+            }
+            update_site_option(LTI_Platform::get_settings_name(), $options);
+            add_settings_error('general', 'settings_updated', __('Settings saved.'), 'success');
+            set_transient('settings_errors', get_settings_errors(), 30);
+        } else {
+            add_settings_error('general', 'settings_update_error', __('Error saving settings.'), 'error');
+            set_transient('settings_errors', get_settings_errors(), 30);
+        }
         wp_redirect(add_query_arg(array('page' => "{$this->plugin_name}-settings", 'settings-updated' => 'true'),
                 network_admin_url('settings.php')));
         exit;
@@ -325,7 +336,7 @@ class LTI_Platform_Admin
      */
     public function section_roles()
     {
-        echo '<p>' . __('Select the default LTI role(s) to be passed to a tool for each WordPress role.', $this->plugin_name) . "</p>\n";
+        echo '<p>' . esc_html__('Select the default LTI role(s) to be passed to a tool for each WordPress role.', $this->plugin_name) . "</p>\n";
     }
 
     /**
@@ -356,7 +367,7 @@ class LTI_Platform_Admin
     public function field_checkbox($args)
     {
         $checked = LTI_Platform::getOption($args['name'], 'false');
-        echo('<input id="' . esc_attr($args['label_for']) . '" type="checkbox" aria-required="false" value="true" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . ']"' .
+        echo('<input id="' . esc_attr($args['label_for']) . '" type="checkbox" aria-required="false" value="true" name="' . esc_attr(LTI_Platform::get_settings_name()) . '[' . esc_attr($args['name']) . ']"' .
         checked($checked === 'true', true, false) . '>' . "\n");
     }
 
@@ -370,7 +381,7 @@ class LTI_Platform_Admin
         $text = LTI_Platform::getOption($args['name'], '');
         echo('<input id="' . esc_attr($args['label_for']) . '" type="text" aria-required="false" value="');
         echo(esc_attr($text));
-        echo('" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . ']">' . "\n");
+        echo('" name="' . esc_attr(LTI_Platform::get_settings_name()) . '[' . esc_attr($args['name']) . ']">' . "\n");
     }
 
     /**
@@ -381,8 +392,8 @@ class LTI_Platform_Admin
     public function field_textarea($args)
     {
         $textarea = LTI_Platform::getOption($args['name'], '');
-        echo('<textarea id=" ' . esc_attr($args['label_for']) . '" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . ']" class="code" rows="' . esc_attr($args['rows']) . '" cols="' . esc_attr($args['cols']) . '">');
-        echo(esc_attr($textarea));
+        echo('<textarea id=" ' . esc_attr($args['label_for']) . '" name="' . esc_attr(LTI_Platform::get_settings_name()) . '[' . esc_attr($args['name']) . ']" class="code" rows="' . esc_attr($args['rows']) . '" cols="' . esc_attr($args['cols']) . '">');
+        echo(esc_textarea($textarea));
         echo('</textarea>' . "\n");
     }
 
@@ -394,7 +405,7 @@ class LTI_Platform_Admin
     public function field_role($args)
     {
         $roles = LTI_Platform::getOption($args['name'], array());
-        echo('<select id="' . esc_attr($args['label_for']) . '" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . '][]" size="6" multiple>' . "\n");
+        echo('<select id="' . esc_attr($args['label_for']) . '" name="' . esc_attr(LTI_Platform::get_settings_name()) . '[' . esc_attr($args['name']) . '][]" size="6" multiple>' . "\n");
         echo('  <option value="administrator"' . selected(in_array('administrator', $roles), true, false) . '>Administrator</option>' . "\n");
         echo('  <option value="contentdeveloper"' . selected(in_array('contentdeveloper', $roles), true, false) . '>Content developer</option>' . "\n");
         echo('  <option value="instructor"' . selected(in_array('instructor', $roles), true, false) . '>Instructor</option>' . "\n");
@@ -412,7 +423,7 @@ class LTI_Platform_Admin
     public function field_target($args)
     {
         $target = LTI_Platform::getOption($args['name'], '');
-        echo('<select id="' . esc_attr($args['label_for']) . '" name="' . LTI_Platform::get_settings_name() . '[' . esc_attr($args['name']) . ']">' . "\n");
+        echo('<select id="' . esc_attr($args['label_for']) . '" name="' . esc_attr(LTI_Platform::get_settings_name()) . '[' . esc_attr($args['name']) . ']">' . "\n");
         echo('  <option value="window"' . selected($target === 'window', true, false) . '>New window</option>' . "\n");
         echo('  <option value="popup"' . selected($target === 'popup', true, false) . '>Pop-up window</option>' . "\n");
         echo('  <option value="iframe"' . selected($target === 'iframe', true, false) . '>iFrame</option>' . "\n");
@@ -464,15 +475,11 @@ class LTI_Platform_Admin
         if (empty($_REQUEST['tool'])) {
             $tool = new LTI_Platform_Tool(LTI_platform::$ltiPlatformDataConnector);
         } else {
-            $tool = LTI_Platform_Tool::fromRecordId(intval(sanitize_text_field($_REQUEST['tool'])),
+            $tool = LTI_Platform_Tool::fromRecordId(intval(sanitize_text_field(wp_unslash($_REQUEST['tool']))),
                     LTI_Platform::$ltiPlatformDataConnector);
         }
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!isset($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce'], "{$this->plugin_name}-nonce")) {
-                add_action('all_admin_notices', array($this, 'error_update'));
-            } else {
-                $this->update_tool($tool);
-            }
+        if (isset($_SERVER['REQUEST_METHOD']) && ($_SERVER['REQUEST_METHOD'] === 'POST')) {
+            $this->update_tool($tool);
         }
         require_once plugin_dir_path(dirname(__FILE__)) . 'admin/partials/lti-platform-admin-edit.php';
     }
@@ -497,51 +504,69 @@ class LTI_Platform_Admin
      */
     private function update_tool($tool)
     {
-        $tool->name = sanitize_text_field($_POST['name']);
-        $tool->code = sanitize_text_field($_POST['code']);
-        $tool->enabled = !empty($_POST['enabled']) && (sanitize_text_field($_POST['enabled']) === 'true');
-        $tool->debugMode = !empty($_POST['debugmode']) && (sanitize_text_field($_POST['debugmode']) === 'true');
-        $tool->setSetting('sendUserName',
-            (!empty($_POST['sendusername']) && (sanitize_text_field($_POST['sendusername']) === 'true')) ? 'true' : null);
-        $tool->setSetting('sendUserId',
-            (!empty($_POST['senduserid']) && (sanitize_text_field($_POST['senduserid'] === 'true'))) ? 'true' : null);
-        $tool->setSetting('sendUserEmail',
-            (!empty($_POST['senduseremail']) && (sanitize_text_field($_POST['senduseremail'] === 'true'))) ? 'true' : null);
-        $tool->setSetting('sendUserRole',
-            (!empty($_POST['senduserrole']) && (sanitize_text_field($_POST['senduserrole'] === 'true'))) ? 'true' : null);
-        $tool->setSetting('sendUserUsername',
-            (!empty($_POST['senduserusername']) && (sanitize_text_field($_POST['senduserusername'] === 'true'))) ? 'true' : null);
-        $roles = LTI_Platform::get_roles();
-        foreach (array_keys($roles) as $role) {
-            $tool->setSetting("role_{$role}",
-                (!empty($_POST["role_{$role}"])) ? sanitize_text_field(implode(',', $_POST["role_{$role}"])) : null);
+        $nonce = null;
+        if (isset($_REQUEST['_wpnonce'])) {
+            $nonce = sanitize_text_field(wp_unslash($_REQUEST['_wpnonce']));
         }
-        $tool->setSetting('presentationTarget', sanitize_text_field($_POST['presentationtarget']));
-        $tool->setSetting('presentationWidth', sanitize_text_field($_POST['presentationwidth']));
-        $tool->setSetting('presentationHeight', sanitize_text_field($_POST['presentationheight']));
-        $tool->messageUrl = esc_url_raw($_POST['messageurl']);
-        $tool->useContentItem = !empty($_POST['usecontentitem']) && (sanitize_text_field($_POST['usecontentitem']) === 'true');
-        $tool->contentItemUrl = esc_url_raw($_POST['contentitemurl']);
-        $tool->setSetting('custom', str_replace("\r\n", '&#13;&#10;', sanitize_textarea_field($_POST['custom'])));
-        $tool->setKey(sanitize_text_field($_POST['consumerkey']));
-        $tool->secret = sanitize_text_field($_POST['sharedsecret']);
-        $tool->initiateLoginUrl = sanitize_text_field($_POST['initiateloginurl']);
-        $redirectionUris = trim(sanitize_textarea_field($_POST['redirectionuris']));
-        if (!empty($redirectionUris)) {
-            $tool->redirectionUris = explode("\r\n", sanitize_textarea_field($_POST['redirectionuris']));
+        if (empty($nonce) || !wp_verify_nonce($nonce, "{$this->plugin_name}-nonce")) {
+            add_action('all_admin_notices', array($this, 'error_update'));
         } else {
-            $tool->redirectionUris = array();
+            $tool->name = isset($_POST['name']) ? sanitize_text_field(wp_unslash($_POST['name'])) : '';
+            $tool->code = isset($_POST['code']) ? sanitize_text_field(wp_unslash($_POST['code'])) : '';
+            $tool->enabled = !empty($_POST['enabled']) && (sanitize_text_field(wp_unslash($_POST['enabled'])) === 'true');
+            $tool->debugMode = !empty($_POST['debugmode']) && (sanitize_text_field(wp_unslash($_POST['debugmode'])) === 'true');
+            $tool->setSetting('sendUserName',
+                (!empty($_POST['sendusername']) && (sanitize_text_field(wp_unslash($_POST['sendusername'])) === 'true')) ? 'true' : null);
+            $tool->setSetting('sendUserId',
+                (!empty($_POST['senduserid']) && (sanitize_text_field(wp_unslash($_POST['senduserid'])) === 'true')) ? 'true' : null);
+            $tool->setSetting('sendUserEmail',
+                (!empty($_POST['senduseremail']) && (sanitize_text_field(wp_unslash($_POST['senduseremail'])) === 'true')) ? 'true' : null);
+            $tool->setSetting('sendUserRole',
+                (!empty($_POST['senduserrole']) && (sanitize_text_field(wp_unslash($_POST['senduserrole'])) === 'true')) ? 'true' : null);
+            $tool->setSetting('sendUserUsername',
+                (!empty($_POST['senduserusername']) && (sanitize_text_field(wp_unslash($_POST['senduserusername'])) === 'true')) ? 'true' : null);
+            $roles = LTI_Platform::get_roles();
+            foreach (array_keys($roles) as $role) {
+                if (!empty($_POST["role_{$role}"]) && is_array($_POST["role_{$role}"])) {
+                    $param = array_map('wp_unslash', $_POST["role_{$role}"]);
+                    $param = array_map('sanitize_text_field', $param);
+                    $param = implode(',', $param);
+                } else {
+                    $param = null;
+                }
+                $tool->setSetting("role_{$role}", $param);
+            }
+            $tool->setSetting('presentationTarget',
+                (!empty($_POST['presentationtarget'])) ? sanitize_text_field(wp_unslash($_POST['presentationtarget'])) : null);
+            $tool->setSetting('presentationWidth',
+                (!empty($_POST['presentationwidth'])) ? sanitize_text_field(wp_unslash($_POST['presentationwidth'])) : null);
+            $tool->setSetting('presentationHeight',
+                (!empty($_POST['presentationheight'])) ? sanitize_text_field(wp_unslash($_POST['presentationheight'])) : null);
+            $tool->messageUrl = (!empty($_POST['messageurl'])) ? esc_url_raw(wp_unslash($_POST['messageurl'])) : null;
+            $tool->useContentItem = !empty($_POST['usecontentitem']) && (sanitize_text_field(wp_unslash($_POST['usecontentitem'])) === 'true');
+            $tool->contentItemUrl = (!empty($_POST['contentitemurl'])) ? esc_url_raw(wp_unslash($_POST['contentitemurl'])) : null;
+            $tool->setSetting('custom',
+                (!empty($_POST['custom'])) ? str_replace("\r\n", '&#13;&#10;', sanitize_textarea_field(wp_unslash($_POST['custom']))) : null);
+            $tool->setKey(!empty($_POST['consumerkey']) ? sanitize_text_field(wp_unslash($_POST['consumerkey'])) : null);
+            $tool->secret = (!empty($_POST['sharedsecret'])) ? sanitize_text_field(wp_unslash($_POST['sharedsecret'])) : null;
+            $tool->initiateLoginUrl = !empty($_POST['initiateloginurl']) ? sanitize_text_field(wp_unslash($_POST['initiateloginurl'])) : null;
+            $redirectionUris = !empty($_POST['redirectionuris']) ? trim(sanitize_textarea_field(wp_unslash($_POST['redirectionuris']))) : null;
+            if (!empty($redirectionUris)) {
+                $tool->redirectionUris = explode("\r\n", $redirectionUris);
+            } else {
+                $tool->redirectionUris = array();
+            }
+            $tool->jku = (!empty($_POST['jwksurl'])) ? sanitize_text_field(wp_unslash($_POST['jwksurl'])) : null;
+            $tool->rsaKey = (!empty($_POST['publickey'])) ? sanitize_textarea_field(wp_unslash($_POST['publickey'])) : null;
+            if (empty($tool->initiateLoginUrl) || empty($tool->redirectionUris)) {
+                $tool->ltiVersion = LTI_Platform::get_lti_version(false);
+                $tool->signatureMethod = 'HMAC-SHA1';
+            } else {
+                $tool->ltiVersion = LTI_Platform::get_lti_version(true);
+                $tool->signatureMethod = 'RS256';
+            }
+            $tool->save();
         }
-        $tool->jku = sanitize_text_field($_POST['jwksurl']);
-        $tool->rsaKey = sanitize_textarea_field($_POST['publickey']);
-        if (empty($tool->initiateLoginUrl) || empty($tool->redirectionUris)) {
-            $tool->ltiVersion = LTI_Platform::get_lti_version(false);
-            $tool->signatureMethod = 'HMAC-SHA1';
-        } else {
-            $tool->ltiVersion = LTI_Platform::get_lti_version(true);
-            $tool->signatureMethod = 'RS256';
-        }
-        $tool->save();
     }
 
 }

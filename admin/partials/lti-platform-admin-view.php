@@ -50,8 +50,12 @@ do_action('all_admin_notices');
 
 $list_table->views();
 
+$page = '';
+if (!empty($_REQUEST['page'])) {
+    $page = sanitize_text_field(wp_unslash($_REQUEST['page']));
+}
 echo('  <form method="get" action="">' . "\n");
-echo('    <input type="hidden" name="page" value="' . esc_attr($_REQUEST['page']) . '" />');
+echo('    <input type="hidden" name="page" value="' . esc_attr($page) . '" />');
 
 $list_table->display();
 

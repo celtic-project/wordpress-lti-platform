@@ -62,20 +62,32 @@ function lti_platform_delete_tools($post_type)
 // Check if data should be deleted on uninstall
 if (LTI_Platform::getOption('uninstall', 'false') === 'true') {
     // Delete plugin options.
-    $plugin_name = LTI_Platform::get_settings_name();
-    delete_option($plugin_name);
+    $settings_name = LTI_Platform::get_settings_name();
+    if (is_multisite()) {
+        delete_site_option($settings_name);
+    } else {
+        delete_option($settings_name);
+    }
 
     // Delete plugin user meta.
-    $wpdb->query("DELETE FROM {$wpdb->usermeta} WHERE meta_key LIKE 'wp\_{$plugin_name}-%'");
-    $wpdb->query("DELETE FROM {$wpdb->usermeta} WHERE meta_key LIKE '{$plugin_name}-%'");
-    $wpdb->query("DELETE FROM {$wpdb->usermeta} WHERE meta_key = 'managesettings_page_{$plugin_name}columnshidden'");
+    $plugin_name = LTI_Platform::get_plugin_name();
+    $wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->usermeta} WHERE meta_key LIKE %s", $wpdb->esc_like("wp_{$plugin_name}-") . '%'));
+    $wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->usermeta} WHERE meta_key LIKE %s", $wpdb->esc_like("{$plugin_name}-") . '%'));
+    $wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->usermeta} WHERE meta_key LIKE %s",
+            $wpdb->esc_like("managesettings_page_{$plugin_name}-") . '%'));
+    $wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->usermeta} WHERE meta_key = %s",
+            "managesettings_page_{$plugin_name}columnshidden"));
 
     // Delete tool configurations
-    $sites = get_sites();
-    foreach ($sites as $site) {
-        switch_to_blog($site->blog_id);
+    if (is_multisite()) {
+        $sites = get_sites();
+        foreach ($sites as $site) {
+            switch_to_blog($site->blog_id);
+            lti_platform_delete_tools(LTI_Platform_Tool::POST_TYPE);
+            restore_current_blog();
+        }
+        lti_platform_delete_tools(LTI_Platform_Tool::POST_TYPE_NETWORK);
+    } else {
         lti_platform_delete_tools(LTI_Platform_Tool::POST_TYPE);
-        restore_current_blog();
     }
-    lti_platform_delete_tools(LTI_Platform_Tool::POST_TYPE_NETWORK);
 }

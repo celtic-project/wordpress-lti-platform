@@ -2,10 +2,10 @@
 Contributors: spvickers
 Tags: lti, 1edtech, learning tools interoperability, celtic, platform
 Requires at least: 5.0
-Tested up to: 6.5
+Tested up to: 6.6.2
 Requires PHP: 7.0
-Stable tag: 2.2.1
-License: GNU General Public License Version 3
+Stable tag: 2.3.0
+License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 This plugin allows WordPress to act as an LTI Platform.

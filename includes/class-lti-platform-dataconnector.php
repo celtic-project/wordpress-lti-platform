@@ -86,7 +86,7 @@ class DataConnector_wp extends DataConnector\DataConnector
     {
         $time = time();
         $this->fixToolSettings($tool, true);
-        $settingsValue = json_encode($tool->getSettings());
+        $settingsValue = wp_json_encode($tool->getSettings());
         $this->fixToolSettings($tool, false);
         if ($tool->deleted) {
             $status = 'trash';
@@ -279,7 +279,7 @@ class DataConnector_wp extends DataConnector\DataConnector
             $tool->setSetting('__useContentItem', ($tool->useContentItem) ? 'true' : null);
             $tool->setSetting('__contentItemUrl', $tool->contentItemUrl);
             $tool->setSetting('__initiateLoginUrl', $tool->initiateLoginUrl);
-            $tool->setSetting('__redirectionUris', str_replace('"', '&quot;', json_encode($tool->redirectionUris)));
+            $tool->setSetting('__redirectionUris', str_replace('"', '&quot;', wp_json_encode($tool->redirectionUris)));
             $tool->setSetting('__jku', $tool->jku);
             $tool->setSetting('__rsaKey', str_replace("\r\n", '&#13;&#10;', $tool->rsaKey));
             $last = null;

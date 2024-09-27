@@ -267,92 +267,14 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
     }
 
     /**
-     * Process a form action request.
-     *
-     * @since    1.0.0
-     */
-    public function process_action()
-    {
-        if (!empty($_REQUEST['tool'])) {
-            $ids = sanitize_text_field($_REQUEST['tool']);
-            if (!is_array($ids)) {
-                $ids = array($ids);
-            }
-            $ok = true;
-            if ($this->current_action() === 'trash') {
-                foreach ($ids as $id) {
-                    $tool = LTI_Platform_Tool::fromRecordId(intval($id), LTI_Platform::$ltiPlatformDataConnector);
-                    $ok = $ok && $tool->trash();
-                }
-                if ($ok) {
-                    add_action('all_admin_notices', array($this, 'trash_notice_success'));
-                } else {
-                    add_action('all_admin_notices', array($this, 'trash_notice_error'));
-                }
-            } elseif ($this->current_action() === 'untrash') {
-                foreach ($ids as $id) {
-                    $tool = LTI_Platform_Tool::fromRecordId(intval($id), LTI_Platform::$ltiPlatformDataConnector);
-                    $ok = $ok && $tool->restore();
-                }
-                if ($ok) {
-                    add_action('all_admin_notices', array($this, 'restore_notice_success'));
-                } else {
-                    add_action('all_admin_notices', array($this, 'restore_notice_error'));
-                }
-            } elseif ($this->current_action() === 'delete') {
-                foreach ($ids as $id) {
-                    $tool = new LTI_Platform_Tool(LTI_platform::$ltiPlatformDataConnector);
-                    $tool->setRecordId(intval($id));
-                    $ok = $ok && $tool->delete();
-                }
-                if ($ok) {
-                    add_action('all_admin_notices', array($this, 'delete_notice_success'));
-                } else {
-                    add_action('all_admin_notices', array($this, 'delete_notice_error'));
-                }
-            } else if ($this->current_action() === 'enable') {
-                $denied = false;
-                foreach ($ids as $id) {
-                    $tool = LTI_Platform_Tool::fromRecordId(intval($id), LTI_Platform::$ltiPlatformDataConnector);
-                    if ($tool->canBeEnabled()) {
-                        $tool->enabled = true;
-                        $tool->showMessages = false;
-                        $ok = $ok && $tool->save();
-                    } elseif (!$denied) {
-                        $ok = false;
-                        $denied = true;
-                        add_action('all_admin_notices', array($this, 'enable_notice_denied'));
-                    }
-                }
-                if ($ok) {
-                    add_action('all_admin_notices', array($this, 'enable_notice_success'));
-                } else {
-                    add_action('all_admin_notices', array($this, 'enable_notice_error'));
-                }
-            } else if ($this->current_action() === 'disable') {
-                foreach ($ids as $id) {
-                    $tool = LTI_Platform_Tool::fromRecordId(intval($id), LTI_Platform::$ltiPlatformDataConnector);
-                    $tool->enabled = false;
-                    $tool->showMessages = false;
-                    $ok = $ok && $tool->save();
-                }
-                if ($ok) {
-                    add_action('all_admin_notices', array($this, 'disable_notice_success'));
-                } else {
-                    add_action('all_admin_notices', array($this, 'disable_notice_error'));
-                }
-            }
-        }
-    }
-
-    /**
      * Prepare the table for display.
      *
      * @since    1.0.0
      */
     public function prepare_items()
     {
-        if (!isset($_REQUEST['_wpnonce']) || wp_verify_nonce($_REQUEST['_wpnonce'], LTI_Platform::get_plugin_name() . '-nonce')) {
+        if (!isset($_REQUEST['_wpnonce']) || wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_wpnonce'])),
+                LTI_Platform::get_plugin_name() . '-nonce')) {
             $this->process_action();
 
             $per_page = $this->get_items_per_page(LTI_Platform::get_plugin_name() . '-tool_per_page');
@@ -366,32 +288,32 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
             );
 
             if (isset($_REQUEST['post_status'])) {
-                $args['post_status'] = sanitize_text_field($_REQUEST['post_status']);
+                $args['post_status'] = sanitize_text_field(wp_unslash($_REQUEST['post_status']));
             }
             if (!empty($_REQUEST['s'])) {
-                $args['s'] = sanitize_text_field($_REQUEST['s']);
+                $args['s'] = sanitize_text_field(wp_unslash($_REQUEST['s']));
             }
 
             if (!empty($_REQUEST['orderby'])) {
-                if ('name' == sanitize_text_field($_REQUEST['orderby'])) {
+                if ('name' == sanitize_text_field(wp_unslash($_REQUEST['orderby']))) {
                     $args['orderby'] = 'name';
-                } elseif ('enabled' == sanitize_text_field($_REQUEST['orderby'])) {
+                } elseif ('enabled' == sanitize_text_field(wp_unslash($_REQUEST['orderby']))) {
                     $args['orderby'] = 'enabled';
-                } elseif ('debugMode' == sanitize_text_field($_REQUEST['orderby'])) {
+                } elseif ('debugMode' == sanitize_text_field(wp_unslash($_REQUEST['orderby']))) {
                     $args['orderby'] = 'debugMode';
-                } elseif ('lastAccess' == sanitize_text_field($_REQUEST['orderby'])) {
+                } elseif ('lastAccess' == sanitize_text_field(wp_unslash($_REQUEST['orderby']))) {
                     $args['orderby'] = 'lastAccess';
-                } elseif ('created' == sanitize_text_field($_REQUEST['orderby'])) {
+                } elseif ('created' == sanitize_text_field(wp_unslash($_REQUEST['orderby']))) {
                     $args['orderby'] = 'created';
-                } elseif ('modified' == sanitize_text_field($_REQUEST['orderby'])) {
+                } elseif ('modified' == sanitize_text_field(wp_unslash($_REQUEST['orderby']))) {
                     $args['orderby'] = 'modified';
                 }
             }
 
             if (!empty($_REQUEST['order'])) {
-                if ('asc' == strtolower(sanitize_text_field($_REQUEST['order']))) {
+                if ('asc' == strtolower(sanitize_text_field(wp_unslash($_REQUEST['order'])))) {
                     $args['order'] = 'ASC';
-                } elseif ('desc' == strtolower(sanitize_text_field($_REQUEST['order']))) {
+                } elseif ('desc' == strtolower(sanitize_text_field(wp_unslash($_REQUEST['order'])))) {
                     $args['order'] = 'DESC';
                 }
             }
@@ -399,7 +321,7 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
             $this->items = array_values(LTI_Platform_Tool::all($args));
             $tool_counts = (array) wp_count_posts(LTI_Platform::$postType, 'readable');
             if (isset($_REQUEST['post_status'])) {
-                $total_items = $tool_counts[sanitize_text_field($_REQUEST['post_status'])];
+                $total_items = $tool_counts[sanitize_text_field(wp_unslash($_REQUEST['post_status']))];
             } else {
                 $total_items = array_sum($tool_counts);
             }
@@ -411,7 +333,7 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
                 'per_page' => $per_page,
             ));
 
-            $this->is_trash = isset($_REQUEST['post_status']) && (sanitize_text_field($_REQUEST['post_status']) === 'trash');
+            $this->is_trash = isset($_REQUEST['post_status']) && (sanitize_text_field(wp_unslash($_REQUEST['post_status'])) === 'trash');
         }
     }
 
@@ -430,17 +352,17 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
         $class = (count($_GET) <= 1) ? $class = 'current' : '';
         $views['all'] = $this->get_edit_link(array(), "All <span class=\"count\">({$total_tools})</span>", $class);
         if ($num_tools->publish > 0) {
-            $class = (isset($_GET['post_status']) && (sanitize_text_field($_GET['post_status']) === 'publish')) ? $class = 'current' : '';
+            $class = (isset($_GET['post_status']) && (sanitize_text_field(wp_unslash($_GET['post_status'])) === 'publish')) ? $class = 'current' : '';
             $views['publish'] = $this->get_edit_link(array('post_status' => 'publish'),
                 "Enabled <span class=\"count\">({$num_tools->publish})</span>", $class);
         }
         if ($num_tools->draft) {
-            $class = (isset($_GET['post_status']) && (sanitize_text_field($_GET['post_status']) === 'draft')) ? $class = 'current' : '';
+            $class = (isset($_GET['post_status']) && (sanitize_text_field(wp_unslash($_GET['post_status'])) === 'draft')) ? $class = 'current' : '';
             $views['draft'] = $this->get_edit_link(array('post_status' => 'draft'),
                 "Disabled <span class=\"count\">({$num_tools->draft})</span>", $class);
         }
         if ($num_tools->trash) {
-            $class = (isset($_GET['post_status']) && (sanitize_text_field($_GET['post_status']) === 'trash')) ? $class = 'current' : '';
+            $class = (isset($_GET['post_status']) && (sanitize_text_field(wp_unslash($_GET['post_status'])) === 'trash')) ? $class = 'current' : '';
             $views['trash'] = $this->get_edit_link(array('post_status' => 'trash'),
                 "Bin <span class=\"count\">({$num_tools->trash})</span>", $class);
         }
@@ -539,41 +461,53 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
             $edit_link = add_query_arg(array('page' => LTI_Platform::get_plugin_name() . '-edit', 'tool' => absint($item->getRecordId())),
                 $page);
             $actions['edit'] = sprintf(
-                '<a href = "%1$s" aria-label = "%2$s">%3$s</a>', esc_url($edit_link),
+                '<a href = "%1$s" aria-label = "%2$s">%3$s</a>',
+                esc_url($edit_link),
+                /* translators: %s: Name of a tool */
                 esc_attr(sprintf(__('Edit &#8220;%s&#8221;', LTI_Platform::get_plugin_name()), $item->name)),
                 esc_html(__('Edit', LTI_Platform::get_plugin_name()))
             );
             if (!$item->enabled) {
                 $enable_link = add_query_arg(array('action' => 'enable', 'tool' => absint($item->getRecordId())), $url);
                 $actions['enable'] = sprintf(
-                    '<a href="%1$s" aria-label="%2$s">%3$s</a>', esc_url($enable_link),
+                    '<a href="%1$s" aria-label="%2$s">%3$s</a>',
+                    esc_url($enable_link),
+                    /* translators: %s: Name of a tool */
                     esc_attr(sprintf(__('Enable &#8220;%s&#8221;', LTI_Platform::get_plugin_name()), $item->name)),
                     esc_html__('Enable', LTI_Platform::get_plugin_name())
                 );
             } else {
                 $disable_link = add_query_arg(array('action' => 'disable', 'tool' => absint($item->getRecordId())), $url);
                 $actions['disable'] = sprintf(
-                    '<a href="%1$s" aria-label="%2$s">%3$s</a>', esc_url($disable_link),
+                    '<a href="%1$s" aria-label="%2$s">%3$s</a>',
+                    esc_url($disable_link),
+                    /* translators: %s: Name of a tool */
                     esc_attr(sprintf(__('Disable &#8220;%s&#8221;', LTI_Platform::get_plugin_name()), $item->name)),
                     esc_html__('Disable', LTI_Platform::get_plugin_name())
                 );
             }
             $trash_link = add_query_arg(array('action' => 'trash', 'tool' => absint($item->getRecordId())), $url);
             $actions['trash'] = sprintf(
-                '<a href="%1$s" aria-label="%2$s">%3$s</a>', esc_url($trash_link),
+                '<a href="%1$s" aria-label="%2$s">%3$s</a>',
+                esc_url($trash_link),
+                /* translators: %s: Name of a tool */
                 esc_attr(sprintf(__('Bin &#8220;%s&#8221;', LTI_Platform::get_plugin_name()), $item->name)),
                 esc_html__('Bin', LTI_Platform::get_plugin_name())
             );
         } else {
             $untrash_link = add_query_arg(array('action' => 'untrash', 'tool' => absint($item->getRecordId())), $url);
             $actions['untrash'] = sprintf(
-                '<a href="%1$s" aria-label="%2$s">%3$s</a>', esc_url($untrash_link),
+                '<a href="%1$s" aria-label="%2$s">%3$s</a>',
+                esc_url($untrash_link),
+                /* translators: %s: Name of a tool */
                 esc_attr(sprintf(__('Disable &#8220;%s&#8221;', LTI_Platform::get_plugin_name()), $item->name)),
                 esc_html__('Restore', LTI_Platform::get_plugin_name())
             );
             $delete_link = add_query_arg(array('action' => 'delete', 'tool' => absint($item->getRecordId())), $url);
             $actions['delete'] = sprintf(
-                '<a href="%1$s" aria-label="%2$s">%3$s</a>', esc_url($delete_link),
+                '<a href="%1$s" aria-label="%2$s">%3$s</a>',
+                esc_url($delete_link),
+                /* translators: %s: Name of a tool */
                 esc_attr(sprintf(__('Permanently delete &#8220;%s&#8221;', LTI_Platform::get_plugin_name()), $item->name)),
                 esc_html__('Delete permanently', LTI_Platform::get_plugin_name())
             );
@@ -722,6 +656,85 @@ class LTI_Platform_Tool_List_Table extends WP_List_Table
             esc_html_e('No Network LTI tools found.', LTI_Platform::get_plugin_name());
         } else {
             esc_html_e('No LTI tools found.', LTI_Platform::get_plugin_name());
+        }
+    }
+
+    /**
+     * Process a form action request.
+     *
+     * @since    1.0.0
+     */
+    private function process_action()
+    {
+        if (!empty($_REQUEST['tool'])) {
+            $ids = sanitize_text_field(wp_unslash($_REQUEST['tool']));
+            if (!is_array($ids)) {
+                $ids = array($ids);
+            }
+            $ok = true;
+            if ($this->current_action() === 'trash') {
+                foreach ($ids as $id) {
+                    $tool = LTI_Platform_Tool::fromRecordId(intval($id), LTI_Platform::$ltiPlatformDataConnector);
+                    $ok = $ok && $tool->trash();
+                }
+                if ($ok) {
+                    add_action('all_admin_notices', array($this, 'trash_notice_success'));
+                } else {
+                    add_action('all_admin_notices', array($this, 'trash_notice_error'));
+                }
+            } elseif ($this->current_action() === 'untrash') {
+                foreach ($ids as $id) {
+                    $tool = LTI_Platform_Tool::fromRecordId(intval($id), LTI_Platform::$ltiPlatformDataConnector);
+                    $ok = $ok && $tool->restore();
+                }
+                if ($ok) {
+                    add_action('all_admin_notices', array($this, 'restore_notice_success'));
+                } else {
+                    add_action('all_admin_notices', array($this, 'restore_notice_error'));
+                }
+            } elseif ($this->current_action() === 'delete') {
+                foreach ($ids as $id) {
+                    $tool = new LTI_Platform_Tool(LTI_platform::$ltiPlatformDataConnector);
+                    $tool->setRecordId(intval($id));
+                    $ok = $ok && $tool->delete();
+                }
+                if ($ok) {
+                    add_action('all_admin_notices', array($this, 'delete_notice_success'));
+                } else {
+                    add_action('all_admin_notices', array($this, 'delete_notice_error'));
+                }
+            } else if ($this->current_action() === 'enable') {
+                $denied = false;
+                foreach ($ids as $id) {
+                    $tool = LTI_Platform_Tool::fromRecordId(intval($id), LTI_Platform::$ltiPlatformDataConnector);
+                    if ($tool->canBeEnabled()) {
+                        $tool->enabled = true;
+                        $tool->showMessages = false;
+                        $ok = $ok && $tool->save();
+                    } elseif (!$denied) {
+                        $ok = false;
+                        $denied = true;
+                        add_action('all_admin_notices', array($this, 'enable_notice_denied'));
+                    }
+                }
+                if ($ok) {
+                    add_action('all_admin_notices', array($this, 'enable_notice_success'));
+                } else {
+                    add_action('all_admin_notices', array($this, 'enable_notice_error'));
+                }
+            } else if ($this->current_action() === 'disable') {
+                foreach ($ids as $id) {
+                    $tool = LTI_Platform_Tool::fromRecordId(intval($id), LTI_Platform::$ltiPlatformDataConnector);
+                    $tool->enabled = false;
+                    $tool->showMessages = false;
+                    $ok = $ok && $tool->save();
+                }
+                if ($ok) {
+                    add_action('all_admin_notices', array($this, 'disable_notice_success'));
+                } else {
+                    add_action('all_admin_notices', array($this, 'disable_notice_error'));
+                }
+            }
         }
     }
 
