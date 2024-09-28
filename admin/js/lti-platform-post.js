@@ -10,33 +10,29 @@ var LtiPlatformProps = null;
   }));
 
   var LtiPlatformButton = function (props) {
-    return wp.element.createElement(
-            wp.blockEditor.RichTextToolbarButton, {
-              icon: LtiPlatformIcon,
-              title: 'LTI tool',
-              onClick: function () {
-                if (typeof props.value.start === 'undefined') {
-                  props.value.start = props.value.text.length;
-                  props.value.end = props.value.text.length;
-                }
-                LtiPlatformText = '';
-                if (props.value.end > props.value.start) {
-                  LtiPlatformText = props.value.text.substr(props.value.start, props.value.end - props.value.start);
-                }
-                LtiPlatformProps = props;
-                jQuery('.lti-platform-modal').addClass("active");
-              },
-            }
-    );
+    return wp.element.createElement(wp.blockEditor.RichTextToolbarButton, {
+      icon: LtiPlatformIcon,
+      title: 'LTI tool',
+      onClick: function () {
+        if (typeof props.value.start === 'undefined') {
+          props.value.start = props.value.text.length;
+          props.value.end = props.value.text.length;
+        }
+        LtiPlatformText = '';
+        if (props.value.end > props.value.start) {
+          LtiPlatformText = props.value.text.substr(props.value.start, props.value.end - props.value.start);
+        }
+        LtiPlatformProps = props;
+        jQuery('.lti-platform-modal').addClass("active");
+      }
+    });
   }
-  wp.richText.registerFormatType(
-          'lti-platform-format/insert-tool', {
-            title: 'LTI tool',
-            tagName: 'ltiplatformtool',
-            className: null,
-            edit: LtiPlatformButton,
-          }
-  );
+  wp.richText.registerFormatType('lti-platform-format/insert-tool', {
+    title: 'LTI tool',
+    tagName: 'ltiplatformtool',
+    className: null,
+    edit: LtiPlatformButton
+  });
 })(window.wp);
 
 (function ($) {
