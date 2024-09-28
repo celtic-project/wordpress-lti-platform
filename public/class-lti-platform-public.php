@@ -501,10 +501,13 @@ class LTI_Platform_Public
                 $atts = str_replace('\\;', $semicolon, $atts);
                 $doublequote = $this->getSubstituteString($atts);
                 $atts = str_replace('\\"', $doublequote, $atts);
+                $singlequote = $this->getSubstituteString($atts);
+                $atts = str_replace('\\\'', $singlequote, $atts);
                 $atts = shortcode_parse_atts($atts);
                 foreach ($atts as $key => $value) {
                     $value = str_replace($semicolon, '\\;', $value);
                     $value = str_replace($doublequote, '\\"', $value);
+                    $value = str_replace($singlequote, '\'', $value);
                     $atts[$key] = $value;
                 }
                 if (!empty($atts['id']) && ($atts['id'] === $id)) {
