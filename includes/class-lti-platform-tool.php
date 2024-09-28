@@ -475,13 +475,13 @@ class LTI_Platform_Tool extends Tool
                 case 'popup':
                         $title = (empty($atts['title'])) ? "Launch {$atts['tool']} tool" : $atts['title'];
                         $title = str_replace('"', '&quot;', $title);
-                        $html = "<a href=\"#\" title=\"{$title}\" onclick=\"window.open('{$url}', '', '{$size}'); return false;\">{$link_text}</a>";
+                        $html = "<a href=\"#\"{$class}{$style} title=\"{$title}\" onclick=\"window.open('{$url}', '', '{$size}'); return false;\">{$link_text}</a>";
                     break;
                 case 'iframe':
                     $url = add_query_arg(array('embed' => ''), $url);
                         $title = (empty($atts['title'])) ? "Embed {$atts['tool']} tool" : $atts['title'];
                         $title = str_replace('"', '&quot;', $title);
-                        $html = "<a href=\"{$url}\" title=\"{$title}\">{$link_text}</a>";
+                        $html = "<a href=\"{$url}\"{$class}{$style} title=\"{$title}\">{$link_text}</a>";
                     break;
                 case 'embed':
                     $html = "{$content}</p><div><iframe style=\"border: none;{$size}\" class=\"\" src=\"{$url}\" allowfullscreen></iframe></div><p>";
