@@ -2,7 +2,7 @@
 Contributors: spvickers
 Tags: lti, 1edtech, learning tools interoperability, celtic, platform
 Requires at least: 5.0
-Tested up to: 6.6.2
+Tested up to: 6.7
 Requires PHP: 7.0
 Stable tag: 2.3.0
 License: GPLv3
