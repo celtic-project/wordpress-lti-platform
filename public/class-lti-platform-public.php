@@ -80,6 +80,21 @@ class LTI_Platform_Public
     }
 
     /**
+     * Parse shortcode attributes to fix HTML entities.
+     *
+     * @since 2.3.0
+     */
+    public function shortcode_atts($out, $pairs, $atts, $shortcode)
+    {
+        foreach ($out as $key => $value) {
+            $value = str_replace('&amp;', '&', $value);
+            $out[$key] = html_entity_decode($value);
+        }
+
+        return $out;
+    }
+
+    /**
      * Process a URL for this plugin.
      *
      * @since    1.0.0
@@ -93,7 +108,7 @@ class LTI_Platform_Public
                 echo(wp_kses($this->get_tools_list(), $allowed));
             } else if (isset($_GET['usecontentitem'])) {
                 if (!empty($_GET['tool'])) {
-                header('Content-type: application/json; charset=UTF-8');
+                    header('Content-type: application/json; charset=UTF-8');
                     echo(wp_json_encode($this->get_tool(sanitize_text_field(wp_unslash($_GET['tool'])))));
                 }
             } else if (isset($_GET['keys'])) {
@@ -129,7 +144,7 @@ class LTI_Platform_Public
         $ok = !empty($_REQUEST['client_id']);
         if ($ok) {
             $tool = LTI_Platform_Tool::fromCode(sanitize_text_field(wp_unslash($_REQUEST['client_id'])),
-                    LTI_Platform::$ltiPlatformDataConnector);
+                LTI_Platform::$ltiPlatformDataConnector);
             $ok = !empty($tool->created);
         }
         if ($ok) {
@@ -156,7 +171,7 @@ class LTI_Platform_Public
         $ok = !empty($_GET['post']);
         if ($ok) {
             $post = $this->get_post(intval(sanitize_text_field(wp_unslash($_GET['post']))));
-        $ok = !empty($post);
+            $ok = !empty($post);
         }
         if (!$ok) {
             $reason = 'Missing or invalid post attribute in link';
@@ -234,7 +249,7 @@ class LTI_Platform_Public
         $ok = !empty($_GET['post']);
         if ($ok) {
             $post = $this->get_post(intval(sanitize_text_field(wp_unslash($_GET['post']))));
-        $ok = !empty($post);
+            $ok = !empty($post);
         }
         if (!$ok) {
             $reason = __('Missing or invalid post attribute in link', LTI_Platform::get_plugin_name());
@@ -492,8 +507,21 @@ class LTI_Platform_Public
     private function get_link_atts($post, $id)
     {
         $link_atts = array();
+        $customvalues = '';
+        if (LTI_Platform::getOption('checkmeta', 'false') === 'true') {
+            $customfields = get_post_custom($post->ID);
+            if (is_array($customfields)) {
+                foreach ($customfields as $key => $values) {
+                    if (is_array($values)) {
+                        $customvalues .= "\n" . implode("\n", $values);
+                    } elseif (is_string($values)) {
+                        $customvalues .= "\n{$values}";
+                    }
+                }
+            }
+        }
         $pattern = get_shortcode_regex(array(LTI_Platform::get_plugin_name()));
-        if (preg_match_all("/{$pattern}/", $post->post_content, $shortcodes, PREG_SET_ORDER) !== false) {
+        if (preg_match_all("/{$pattern}/", $post->post_content . $customvalues, $shortcodes, PREG_SET_ORDER) !== false) {
             $link_text = '';
             foreach ($shortcodes as $shortcode) {
                 $atts = $shortcode[3];

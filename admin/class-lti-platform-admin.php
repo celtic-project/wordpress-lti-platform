@@ -260,6 +260,9 @@ class LTI_Platform_Admin
         add_settings_field('field_platformguid', __('Platform GUID', $this->plugin_name), array($this, 'field_text'),
             $this->plugin_name, 'section_general',
             array('label_for' => 'id_platformguid', 'name' => 'platformguid', 'class' => 'regular-text'));
+        add_settings_field('field_checkmeta', __('Check custom fields for shortcodes?', $this->plugin_name),
+            array($this, 'field_checkbox'), $this->plugin_name, 'section_general',
+            array('label_for' => 'id_checkmeta', 'name' => 'checkmeta'));
 
         add_settings_section(
             'section_privacy', __('Privacy Settings', $this->plugin_name), array($this, 'section_privacy'), $this->plugin_name

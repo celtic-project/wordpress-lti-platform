@@ -56,6 +56,15 @@ class LTI_Platform_Tool extends Tool
     public $blogId = null;
 
     /**
+     * Whether a tool is defined network-wide.
+     *
+     * @since    2.3.0
+     * @access   public
+     * @var      bool      $isNetwork   True if the tool is defined for the network.
+     */
+    public $isNetwork = null;
+
+    /**
      * The code of the LTI tool.
      *
      * @since    1.0.0
@@ -180,7 +189,8 @@ class LTI_Platform_Tool extends Tool
         foreach ($tools as $tool) {
             if ($tool->getRecordId() === $this->getRecordId()) {
                 continue;
-            } elseif ($tool->code === $this->code) {
+            } elseif (($tool->code === $this->code) && ($tool->isNetwork === $this->isNetwork) &&
+                (!$this->isNetwork && ($this->blogId !== $tool->blogId))) {
                 $ok = false;
                 if ($this->showMessages) {
                     add_action('all_admin_notices', array($this, 'save_notice_duplicate'));
@@ -361,14 +371,19 @@ class LTI_Platform_Tool extends Tool
             'width' => '',
             'height' => '',
             'class' => '',
-            'style' => ''), $atts, LTI_Platform::get_plugin_name());
+            'style' => '',
+            'output' => ''), $atts, LTI_Platform::get_plugin_name());
 
         $error = '';
         $missing = array();
         if (empty($atts['tool'])) {
             $missing[] = 'tool';
         }
-        if (empty($atts['id'])) {
+        $output = $atts['output'];
+        if ($output === 'default') {
+            $output = '';
+        }
+        if (empty($atts['id']) && (empty($output) || ($output === 'href'))) {
             $missing[] = 'id';
         }
         if (!empty($missing)) {
@@ -390,105 +405,138 @@ class LTI_Platform_Tool extends Tool
             }
         }
         if (empty($error)) {
-            if (!empty($content)) {
-                $link_text = $content;
-            } else {
-                $link_text = $atts['tool'];
+            switch ($output) {
+                case '':
+                case 'href':
+                case 'title':
+                case 'width':
+                case 'height':
+                    break;
+                default:
+                    $error = "Invalid value for 'output' attribute: {$output}";
+                    break;
             }
-            if (($target === 'popup') || ($target === 'embed')) {
-                $width = $tool->getSetting('presentationWidth');
-                if (!empty($atts['width'])) {
-                    $width = intval($atts['width']);
-                }
-                $height = $tool->getSetting('presentationHeight');
-                if (!empty($atts['height'])) {
-                    $height = intval($atts['height']);
-                }
-                if ($target === 'popup') {
-                    $sep = ',';
-                    $sep2 = '=';
-                    if (empty($width)) {
-                        $width = '800';
-                    }
-                    if (empty($height)) {
-                        $height = '500';
-                    }
-                } else {
-                    $sep = ';';
-                    $sep2 = ': ';
-                    if (empty($width)) {
-                        $width = '100%';
-                    }
-                    if (empty($height)) {
-                        $height = '400px';
-                    }
-                }
-                $size = '';
-                if (!empty($width)) {
-                    $size = "width{$sep2}{$width}{$sep}";
-                }
-                if (!empty($height)) {
-                    $size .= "height{$sep2}{$height}{$sep}";
-                }
-                if (!empty($size) && ($target === 'popup')) {
-                    $size = substr($size, 0, -1);
-                }
-            }
+        }
+        if (empty($error)) {
             $url = add_query_arg(array(LTI_Platform::get_plugin_name() => '', 'post' => $post->ID, 'id' => $atts['id']),
                 get_site_url());
-            $classes = array();
-            if (!empty($tool->getSetting('presentationClass'))) {
-                $classes = explode(' ', $tool->getSetting('presentationClass'));
+            $width = $tool->getSetting('presentationWidth');
+            if (!empty($atts['width'])) {
+                $width = intval($atts['width']);
             }
-            if (!empty($atts['class'])) {
-                $classes = array_merge($classes, explode(' ', $atts['class']));
+            $height = $tool->getSetting('presentationHeight');
+            if (!empty($atts['height'])) {
+                $height = intval($atts['height']);
             }
-            $class = '';
-            if (!empty($classes)) {
-                $classes = array_unique($classes);
-                $classes = array_map('trim', $classes);
-                $class = ' class="' . implode(' ', $classes) . '"';
-            }
-            $styles = array();
-            if (!empty($tool->getSetting('presentationStyle'))) {
-                preg_match_all("/([^;: ]+) *: *([^;:]+)/", $tool->getSetting('presentationStyle'), $elements);
-                $styles = array_combine($elements[1], $elements[2]);
-            }
-            if (!empty($atts['style'])) {
-                preg_match_all("/([^;: ]+) *: *([^;:]+)/", $atts['style'], $elements);
-                $styles = array_merge($styles, array_combine($elements[1], $elements[2]));
-            }
-            $style = '';
-            if (!empty($styles)) {
-                $style = ' style="';
-                foreach ($styles as $name => $value) {
-                    $style .= "{$name}: {$value}; ";
+            if (!empty($output)) {
+                switch ($output) {
+                    case 'href':
+                        $html = $url;
+                        break;
+                    case 'title':
+                        $html = (empty($atts['title'])) ? "Launch {$atts['tool']} tool" : $atts['title'];
+                        break;
+                    case 'width':
+                        $html = $width;
+                        break;
+                    case 'height':
+                        $html = $height;
+                        break;
                 }
-                $style = trim($style) . '"';
-            }
-            switch ($target) {
-                case 'window':
+                $html = str_replace('"', '&quot;', $html);
+            } else {
+                if (!empty($content)) {
+                    $link_text = $content;
+                } else {
+                    $link_text = $atts['tool'];
+                }
+                if (($target === 'popup') || ($target === 'embed')) {
+                    if ($target === 'popup') {
+                        $sep = ',';
+                        $sep2 = '=';
+                        if (empty($width)) {
+                            $width = '800';
+                        }
+                        if (empty($height)) {
+                            $height = '500';
+                        }
+                    } else {
+                        $sep = ';';
+                        $sep2 = ': ';
+                        if (empty($width)) {
+                            $width = '100%';
+                        }
+                        if (empty($height)) {
+                            $height = '400px';
+                        }
+                    }
+                    $size = '';
+                    if (!empty($width)) {
+                        $size = "width{$sep2}{$width}{$sep}";
+                    }
+                    if (!empty($height)) {
+                        $size .= "height{$sep2}{$height}{$sep}";
+                    }
+                    if (!empty($size) && ($target === 'popup')) {
+                        $size = substr($size, 0, -1);
+                    }
+                }
+                $classes = array();
+                if (!empty($tool->getSetting('presentationClass'))) {
+                    $classes = explode(' ', $tool->getSetting('presentationClass'));
+                }
+                if (!empty($atts['class'])) {
+                    $classes = array_merge($classes, explode(' ', $atts['class']));
+                }
+                $class = '';
+                if (!empty($classes)) {
+                    $classes = array_unique($classes);
+                    $classes = array_map('trim', $classes);
+                    $class = ' class="' . implode(' ', $classes) . '"';
+                }
+                $styles = array();
+                if (!empty($tool->getSetting('presentationStyle'))) {
+                    preg_match_all("/([^;: ]+) *: *([^;:]+)/", $tool->getSetting('presentationStyle'), $elements);
+                    $styles = array_combine($elements[1], $elements[2]);
+                }
+                if (!empty($atts['style'])) {
+                    preg_match_all("/([^;: ]+) *: *([^;:]+)/", $atts['style'], $elements);
+                    $styles = array_merge($styles, array_combine($elements[1], $elements[2]));
+                }
+                $style = '';
+                if (!empty($styles)) {
+                    $style = ' style="';
+                    foreach ($styles as $name => $value) {
+                        $style .= "{$name}: {$value}; ";
+                    }
+                    $style = rtrim($style) . '"';
+                }
+                switch ($target) {
+                    case 'window':
                         $title = (empty($atts['title'])) ? "Launch {$atts['tool']} tool" : $atts['title'];
                         $title = str_replace('"', '&quot;', $title);
                         $html = "<a href=\"{$url}\"{$class}{$style} title=\"{$title}\" target=\"_blank\">{$link_text}</a>";
-                    break;
-                case 'popup':
+                        break;
+                    case 'popup':
                         $title = (empty($atts['title'])) ? "Launch {$atts['tool']} tool" : $atts['title'];
                         $title = str_replace('"', '&quot;', $title);
                         $html = "<a href=\"#\"{$class}{$style} title=\"{$title}\" onclick=\"window.open('{$url}', '', '{$size}'); return false;\">{$link_text}</a>";
-                    break;
-                case 'iframe':
-                    $url = add_query_arg(array('embed' => ''), $url);
+                        break;
+                    case 'iframe':
+                        $url = add_query_arg(array('embed' => ''), $url);
                         $title = (empty($atts['title'])) ? "Embed {$atts['tool']} tool" : $atts['title'];
                         $title = str_replace('"', '&quot;', $title);
                         $html = "<a href=\"{$url}\"{$class}{$style} title=\"{$title}\">{$link_text}</a>";
-                    break;
-                case 'embed':
-                    $html = "{$content}</p><div><iframe style=\"border: none;{$size}\" class=\"\" src=\"{$url}\" allowfullscreen></iframe></div><p>";
-                    break;
+                        break;
+                    case 'embed':
+                        $html = "{$content}</p><div><iframe style=\"border: none;{$size}\" src=\"{$url}\" allowfullscreen></iframe></div><p>";
+                        break;
+                }
             }
-        } else {
+        } elseif (empty($output)) {
             $html = "<strong>{$error}</strong>";
+        } else {
+            $html = str_replace('"', '&quot;', $error);
         }
 
         return $html;

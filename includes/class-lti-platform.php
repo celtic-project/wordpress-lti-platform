@@ -451,6 +451,8 @@ class LTI_Platform
         $this->loader->add_action('parse_request', $plugin_public, 'parse_request');
 
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
+
+        $this->loader->add_filter('shortcode_atts_' . self::get_plugin_name(), $plugin_public, 'shortcode_atts', 10, 4);
     }
 
     /**

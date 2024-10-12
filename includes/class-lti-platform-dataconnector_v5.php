@@ -96,19 +96,24 @@ class DataConnector_wp extends DataConnector\DataConnector
             $status = 'draft';
         }
         $post = array(
-            'post_type' => LTI_Platform::$postType,
             'post_name' => $tool->code,
             'post_title' => $tool->name,
             'post_content' => $settingsValue,
             'post_status' => $status
         );
         if (!empty($tool->getRecordId())) {
+            if ($tool->isNetwork) {
+                $post['post_type'] = LTI_Platform_Tool::POST_TYPE_NETWORK;
+            } else {
+                $post['post_type'] = LTI_Platform_Tool::POST_TYPE;
+            }
             if (is_multisite()) {
                 switch_to_blog($tool->blogId);
             }
             $post['ID'] = $tool->getRecordId();
             $post['post_date_gmt'] = gmdate('Y-m-d H:i:s', $tool->created);
         } else {
+            $post['post_type'] = LTI_Platform::$postType;
             $post['post_date_gmt'] = gmdate('Y-m-d H:i:s', $time);
         }
         $result = wp_insert_post($post);
@@ -221,6 +226,7 @@ class DataConnector_wp extends DataConnector\DataConnector
     {
         $tool->setRecordId(intval($post->ID));
         $tool->blogId = $blogId;
+        $tool->isNetwork = $post->post_type === LTI_Platform_Tool::POST_TYPE_NETWORK;
         $tool->name = $post->post_title;
         $tool->code = $post->post_name;
         $tool->deleted = $post->post_status === 'trash';
