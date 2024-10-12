@@ -414,7 +414,7 @@ echo('    </table>' . "\n");
 echo('' . "\n");
 if ($tool->canUseLTI13()) {
     echo('    <div class="card">' . "\n");
-    echo('      <h3 class="title">' . esc_html__('Platform configuration to share with this tool') . '</h3>' . "\n");
+    echo('      <h3 class="title">' . esc_html__('Platform configuration to share with this tool', LTI_Platform::get_plugin_name()) . '</h3>' . "\n");
     echo('      <div class="inside">' . "\n");
     echo('        <table>' . "\n");
     echo('          <tbody>' . "\n");

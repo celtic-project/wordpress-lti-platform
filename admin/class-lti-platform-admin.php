@@ -182,10 +182,10 @@ class LTI_Platform_Admin
                 $options[$option] = $value;
             }
             update_site_option(LTI_Platform::get_settings_name(), $options);
-            add_settings_error('general', 'settings_updated', __('Settings saved.'), 'success');
+            add_settings_error('general', 'settings_updated', __('Settings saved.', $this->plugin_name), 'success');
             set_transient('settings_errors', get_settings_errors(), 30);
         } else {
-            add_settings_error('general', 'settings_update_error', __('Error saving settings.'), 'error');
+            add_settings_error('general', 'settings_update_error', __('Error saving settings.', $this->plugin_name), 'error');
             set_transient('settings_errors', get_settings_errors(), 30);
         }
         wp_redirect(add_query_arg(array('page' => "{$this->plugin_name}-settings", 'settings-updated' => 'true'),
@@ -484,7 +484,7 @@ class LTI_Platform_Admin
             $tool = new LTI_Platform_Tool(LTI_platform::$ltiPlatformDataConnector);
         } else {
             $tool = LTI_Platform_Tool::fromRecordId(intval(sanitize_text_field(wp_unslash($_REQUEST['tool']))),
-                    LTI_Platform::$ltiPlatformDataConnector);
+                LTI_Platform::$ltiPlatformDataConnector);
         }
         if (isset($_SERVER['REQUEST_METHOD']) && ($_SERVER['REQUEST_METHOD'] === 'POST')) {
             $this->update_tool($tool);
