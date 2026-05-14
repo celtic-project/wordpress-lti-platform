@@ -85,9 +85,14 @@ class DataConnector_wp extends DataConnector\DataConnector
     public function saveTool(Tool $tool): bool
     {
         $time = time();
+        $secret = $tool->secret;
+        if (method_exists('ceLTIc\\LTI\\Util', 'encrypt')) {
+            $tool->secret = Util::encrypt($secret);
+        }
         $this->fixToolSettings($tool, true);
         $settingsValue = wp_json_encode($tool->getSettings());
         $this->fixToolSettings($tool, false);
+        $tool->secret = $secret;
         if ($tool->deleted) {
             $status = 'trash';
         } elseif ($tool->enabled) {
@@ -240,6 +245,7 @@ class DataConnector_wp extends DataConnector\DataConnector
         $settings = array_merge($tool->getSettings(), $settings);
         $tool->setSettings($settings);
         $this->fixToolSettings($tool, false);
+        $tool->secret = Util::decrypt($tool->secret);
     }
 
     /**
