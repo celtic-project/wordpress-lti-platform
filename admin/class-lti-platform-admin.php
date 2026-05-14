@@ -166,6 +166,21 @@ class LTI_Platform_Admin
                 switch ($option) {
                     case 'privatekey':
                         $value = sanitize_textarea_field(wp_unslash($value));
+                        if (!empty($value)) {
+                            $res = openssl_pkey_get_private($value);
+                            if ($res === false) {
+                                add_settings_error('general', 'settings_updated', __('Invalid private key.'), 'error');
+                            } else {
+                                $details = openssl_pkey_get_details($res);
+                                if (($details === false) || (!isset($details['rsa']) && !isset($details['ec']))) {
+                                    add_settings_error('general', 'settings_updated',
+                                        __('The private key must have a type of \'RSA\' or \'EC\'.'), 'error');
+                                } elseif (!isset($details['bits']) || ($details['bits'] < 2048)) {
+                                    add_settings_error('general', 'settings_updated',
+                                        __('A private key with at least 2,048 bits is recommended.'), 'warning');
+                                }
+                            }
+                        }
                         break;
                     default:
                         if (!is_array($value)) {
