@@ -287,7 +287,7 @@ class DataConnector_wp extends DataConnector\DataConnector
             $tool->setSetting('__initiateLoginUrl', $tool->initiateLoginUrl);
             $tool->setSetting('__redirectionUris', str_replace('"', '&quot;', wp_json_encode($tool->redirectionUris)));
             $tool->setSetting('__jku', $tool->jku);
-            $tool->setSetting('__rsaKey', str_replace("\r\n", '&#13;&#10;', $tool->rsaKey));
+            $tool->setSetting('__rsaKey', str_replace("\r\n", '&#13;&#10;', $tool->rsaKey ?? ''));
             $last = null;
             if (!empty($tool->lastAccess)) {
                 $last = gmdate($this->dateFormat, $tool->lastAccess);
