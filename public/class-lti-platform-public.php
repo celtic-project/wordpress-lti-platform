@@ -102,6 +102,9 @@ class LTI_Platform_Public
     public function parse_request()
     {
         if (isset($_GET[LTI_Platform::get_plugin_name()])) {
+            if (LTI_Platform::getOption('debug', 'false') === 'true') {
+                LTI_Platform::set_debug_loglevel();
+            }
             if (isset($_GET['tools'])) {
                 header('Content-type: text/html; charset=UTF-8');
                 $allowed = array('div' => array('class' => true), 'h2' => array(), 'p' => array(), 'br' => array(), 'input' => array('type' => true, 'name' => true, 'class' => true, 'value' => true, 'toolname' => true), 'button' => array('class' => true, 'id' => true, 'disabled' => true));

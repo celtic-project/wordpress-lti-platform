@@ -145,9 +145,6 @@ class LTI_Platform
      */
     public function run()
     {
-        if (LTI_Platform::getOption('debug', 'false') === 'true') {
-            $this->set_debug_loglevel();
-        }
         $this->loader->run();
     }
 
@@ -325,6 +322,20 @@ class LTI_Platform
     }
 
     /**
+     * Set debug level logging.
+     *
+     * @since    2.2.0
+     */
+    public static function set_debug_loglevel()
+    {
+        if (self::use_lti_library_v5()) {
+            Util::$logLevel = LogLevel::Debug;
+        } else {
+            Util::$logLevel = Util::LOGLEVEL_DEBUG;
+        }
+    }
+
+    /**
      * Load the required dependencies for this plugin.
      *
      * Create an instance of the loader which will be used to register the hooks
@@ -484,20 +495,6 @@ class LTI_Platform
     private function check_lti_library()
     {
         return class_exists('ceLTIc\LTI\Platform');
-    }
-
-    /**
-     * Set debug level logging.
-     *
-     * @since    2.2.0
-     */
-    private function set_debug_loglevel()
-    {
-        if (self::use_lti_library_v5()) {
-            Util::$logLevel = LogLevel::Debug;
-        } else {
-            Util::$logLevel = Util::LOGLEVEL_DEBUG;
-        }
     }
 
 }
