@@ -41,7 +41,7 @@ if (defined('WP_NETWORK_ADMIN') && WP_NETWORK_ADMIN) {
 echo('<div class="wrap">' . "\n");
 echo('  <h1 class="wp-heading-inline">LTI Tools</h1>' . "\n");
 if (!is_multisite() || defined('WP_NETWORK_ADMIN') && WP_NETWORK_ADMIN) {
-    echo('  <a href="' . esc_url($file . '?page=' . LTI_Platform::get_plugin_name() . '-settings') . '" class="page-title-action">Default settings</a>' . "\n");
+    echo('  <a href="' . esc_url($file . '?page=' . LTI_Platform::get_plugin_name() . '-settings') . '" class="page-title-action">Settings</a>' . "\n");
 }
 echo('  <a href="' . esc_url($file . '?page=' . LTI_Platform::get_plugin_name() . '-edit') . '" class="page-title-action">Add New</a>' . "\n");
 echo('  <hr class="wp-header-end">' . "\n");

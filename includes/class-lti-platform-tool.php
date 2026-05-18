@@ -269,7 +269,7 @@ class LTI_Platform_Tool extends Tool
      */
     public function save_notice_disabled()
     {
-        $this->save_notice('This tool cannot be enabled because it is not fully configured for either LTI 1.0 or LTI 1.3, or no private key has been defined.',
+        $this->save_notice('This tool cannot be enabled because it is not fully configured for LTI 1.0 and/or LTI 1.3, or no private key has been defined.',
             'warning');
     }
 

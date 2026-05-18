@@ -71,6 +71,7 @@ echo('            </label>' . "\n");
 echo('          </th>' . "\n");
 echo('          <td>' . "\n");
 echo('            <input id="id_name" type="text" aria-required="true" value="' . esc_attr($tool->name) . '" name="name" class="regular-text">' . "\n");
+echo('            <p class="description">' . esc_html__('Name of tool for display purposes', LTI_Platform::get_plugin_name()) . '</p>' . "\n");
 echo('          </td>' . "\n");
 echo('        </tr>' . "\n");
 echo('        <tr class="form-required">' . "\n");
@@ -82,6 +83,7 @@ echo('            </label>' . "\n");
 echo('          </th>' . "\n");
 echo('          <td>' . "\n");
 echo('            <input id="id_code" type="text" aria-required="true" value="' . esc_attr($tool->code) . '" name="code" class="regular-text">' . "\n");
+echo('            <p class="description">' . esc_html__('Lowercase shortcode for tool', LTI_Platform::get_plugin_name()) . '</p>' . "\n");
 echo('          </td>' . "\n");
 echo('        </tr>' . "\n");
 echo('        <tr>' . "\n");
@@ -200,6 +202,8 @@ echo('    </table>' . "\n");
 echo('' . "\n");
 echo('    <h2>' . esc_html__('Presentation Settings', LTI_Platform::get_plugin_name()) . '</h2>' . "\n");
 echo('' . "\n");
+echo('    <p>' . esc_html__('Select the presentation settings for when the tool is opened.', LTI_Platform::get_plugin_name()) . '</p>' . "\n");
+echo('' . "\n");
 echo('    <table class="form-table">' . "\n");
 echo('      <tbody>' . "\n");
 echo('        <tr class="form-required">' . "\n");
@@ -219,26 +223,32 @@ echo('              <option value="iframe"' . selected($tool->getSetting('presen
 echo('              <option value="embed"' . selected($tool->getSetting('presentationTarget'), 'embed', true, false) . '>' . esc_html__('Embed',
     LTI_Platform::get_plugin_name()) . '</option>' . "\n");
 echo('            </select>' . "\n");
+echo('            <p class="description">' . esc_html__('Select the destination where the tool should be opened',
+    LTI_Platform::get_plugin_name()) . '</p>' . "\n");
 echo('          </td>' . "\n");
 echo('        </tr>' . "\n");
 echo('        <tr>' . "\n");
 echo('          <th scope="row">' . "\n");
 echo('            <label for="id_presentationwidth">' . "\n");
-echo('              ' . esc_html__('Width of popup window', LTI_Platform::get_plugin_name()) . "\n");
+echo('              ' . esc_html__('Width', LTI_Platform::get_plugin_name()) . "\n");
 echo('            </label>' . "\n");
 echo('          </th>' . "\n");
 echo('          <td>' . "\n");
 echo('            <input id="id_presentationwidth" type="text" aria-required="false" value="' . esc_attr($tool->getSetting('presentationWidth')) . '" name="presentationwidth" class="small-text">' . "\n");
+echo('            <p class="description">' . esc_html__('Width (in pixels) to use for pop-up windows and iframes',
+    LTI_Platform::get_plugin_name()) . '</p>' . "\n");
 echo('          </td>' . "\n");
 echo('        </tr>' . "\n");
 echo('        <tr>' . "\n");
 echo('          <th scope="row">' . "\n");
 echo('            <label for="id_presentationheight">' . "\n");
-echo('              ' . esc_html__('Height of popup window', LTI_Platform::get_plugin_name()) . "\n");
+echo('              ' . esc_html__('Height', LTI_Platform::get_plugin_name()) . "\n");
 echo('            </label>' . "\n");
 echo('          </th>' . "\n");
 echo('          <td>' . "\n");
 echo('            <input id="id_presentationheight" type="text" aria-required="false" value="' . esc_attr($tool->getSetting('presentationHeight')) . '" name="presentationheight" class="small-text">' . "\n");
+echo('            <p class="description">' . esc_html__('Height (in pixels) to use for pop-up windows and iframes',
+    LTI_Platform::get_plugin_name()) . '</p>' . "\n");
 echo('          </td>' . "\n");
 echo('        </tr>' . "\n");
 echo('        <tr>' . "\n");
@@ -250,6 +260,8 @@ echo('          </th>' . "\n");
 echo('          <td>' . "\n");
 echo('            <input id="id_presentationclass" type="text" aria-required="false" value="' . esc_attr($tool->getSetting('presentationClass',
         $defaultclass)) . '" name="presentationclass" class="large-text">' . "\n");
+echo('            <p class="description">' . esc_html__('Enter a space separated list of class names',
+    LTI_Platform::get_plugin_name()) . '</p>' . "\n");
 echo('          </td>' . "\n");
 echo('        </tr>' . "\n");
 echo('        <tr>' . "\n");
@@ -261,12 +273,16 @@ echo('          </th>' . "\n");
 echo('          <td>' . "\n");
 echo('            <input id="id_presentationstyle" type="text" aria-required="false" value="' . esc_attr($tool->getSetting('presentationStyle',
         $defaultstyle)) . '" name="presentationstyle" class="large-text">' . "\n");
+echo('            <p class="description">' . esc_html__('Enter a semicolon separated list of style settings',
+    LTI_Platform::get_plugin_name()) . '</p>' . "\n");
 echo('          </td>' . "\n");
 echo('        </tr>' . "\n");
 echo('      </tbody>' . "\n");
 echo('    </table>' . "\n");
 echo('' . "\n");
 echo('    <h2>' . esc_html__('Privacy Settings', LTI_Platform::get_plugin_name()) . '</h2>' . "\n");
+echo('' . "\n");
+echo('    <p>' . esc_html__('Select the privacy settings for data to be passed to the tool.', LTI_Platform::get_plugin_name()) . '</p>' . "\n");
 echo('' . "\n");
 echo('    <table class="form-table">' . "\n");
 echo('      <tbody>' . "\n");
@@ -406,7 +422,7 @@ echo('              <span class="description">' . esc_html__('(PEM format)', LTI
 echo('            </label>' . "\n");
 echo('          </th>' . "\n");
 echo('          <td>' . "\n");
-echo('            <textarea id="id_publickey" name="publickey" class="code large-text" rows="10">' . esc_textarea($tool->rsaKey) . '</textarea>' . "\n");
+echo('            <textarea id="id_publickey" name="publickey" class="code large-text" rows="10" placeholder="e.g.' . "\n" . '-----BEGIN PUBLIC KEY-----' . "\n" . '...' . "\n" . '-----END PUBLIC KEY-----">' . esc_textarea($tool->rsaKey) . '</textarea>' . "\n");
 echo('          </td>' . "\n");
 echo('        </tr>' . "\n");
 echo('      </tbody>' . "\n");
