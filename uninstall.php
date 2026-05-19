@@ -59,8 +59,13 @@ function lti_platform_delete_tools($post_type)
     }
 }
 
-// Check if data should be deleted on uninstall
-if (LTI_Platform::getOption('uninstall', 'false') === 'true') {
+/**
+ * Delete data for plugin.
+ *
+ * @since     2.3.1
+ */
+function lti_platform_delete_data()
+{
     // Delete plugin options.
     $settings_name = LTI_Platform::get_settings_name();
     if (is_multisite()) {
@@ -90,4 +95,9 @@ if (LTI_Platform::getOption('uninstall', 'false') === 'true') {
     } else {
         lti_platform_delete_tools(LTI_Platform_Tool::POST_TYPE);
     }
+}
+
+// Check if data should be deleted on uninstall
+if (LTI_Platform::getOption('uninstall', 'false') === 'true') {
+    lti_platform_delete_data();
 }
