@@ -176,7 +176,7 @@ foreach ($roles as $key => $role) {
     echo('        <tr class="form-required">' . "\n");
     echo('          <th scope="row">' . "\n");
     echo('            <label for="id_role_' . esc_attr($key) . '">' . "\n");
-    echo('              ' . esc_html__($role['name'], LTI_Platform::get_plugin_name()) . "\n");
+    echo('              ' . esc_attr($role['name']) . "\n");
     echo('            </label>' . "\n");
     echo('          </th>' . "\n");
     echo('          <td>' . "\n");
@@ -411,7 +411,7 @@ echo('              ' . esc_html__('Public Keyset URL', LTI_Platform::get_plugin
 echo('            </label>' . "\n");
 echo('          </th>' . "\n");
 echo('          <td>' . "\n");
-echo('            <input id="id_jwksurl" type="url" aria-required="true" value="' . esc_url($tool->jku) . '" name="jwksurl" class="large-text">' . "\n");
+echo('            <input id="id_jwksurl" type="url" aria-required="true" value="' . esc_attr($tool->jku) . '" name="jwksurl" class="large-text">' . "\n");
 echo('          </td>' . "\n");
 echo('        </tr>' . "\n");
 echo('        <tr>' . "\n");
@@ -422,7 +422,7 @@ echo('              <span class="description">' . esc_html__('(PEM format)', LTI
 echo('            </label>' . "\n");
 echo('          </th>' . "\n");
 echo('          <td>' . "\n");
-echo('            <textarea id="id_publickey" name="publickey" class="code large-text" rows="10" placeholder="e.g.' . "\n" . '-----BEGIN PUBLIC KEY-----' . "\n" . '...' . "\n" . '-----END PUBLIC KEY-----">' . esc_textarea($tool->rsaKey) . '</textarea>' . "\n");
+echo('            <textarea id="id_publickey" name="publickey" class="code large-text" rows="10" placeholder="e.g.&#10;-----BEGIN PUBLIC KEY-----&#10;...&#10;-----END PUBLIC KEY-----">' . esc_textarea($tool->rsaKey ? $tool->rsaKey : '') . '</textarea>' . "\n");
 echo('          </td>' . "\n");
 echo('        </tr>' . "\n");
 echo('      </tbody>' . "\n");
@@ -434,11 +434,11 @@ if ($tool->canUseLTI13()) {
     echo('      <div class="inside">' . "\n");
     echo('        <table>' . "\n");
     echo('          <tbody>' . "\n");
-    echo('            <tr><th class="alignleft">' . esc_html__('Platform ID', LTI_Platform::get_plugin_name()) . '</th><td>' . esc_url(get_option('siteurl')) . '</td></tr>' . "\n");
+    echo('            <tr><th class="alignleft">' . esc_html__('Platform ID', LTI_Platform::get_plugin_name()) . '</th><td>' . esc_attr(get_option('siteurl')) . '</td></tr>' . "\n");
     echo('            <tr><th class="alignleft">' . esc_html__('Client ID', LTI_Platform::get_plugin_name()) . '</th><td>' . esc_html($tool->code) . '</td></tr>' . "\n");
     echo('            <tr><th class="alignleft">' . esc_html__('Deployment ID', LTI_Platform::get_plugin_name()) . '</th><td>' . esc_html(get_current_blog_id()) . '</td></tr>' . "\n");
-    echo('            <tr><th class="alignleft">' . esc_html__('Public Keyset URL', LTI_Platform::get_plugin_name()) . '</th><td>' . esc_url(get_option('siteurl') . '/?' . LTI_Platform::get_plugin_name() . '&amp;keys') . '</td></tr>' . "\n");
-    echo('            <tr><th class="alignleft">' . esc_html__('Authentication request URL', LTI_Platform::get_plugin_name()) . '</th><td>' . esc_url(get_option('siteurl') . '/?' . LTI_Platform::get_plugin_name() . '&amp;auth') . '</td></tr>' . "\n");
+    echo('            <tr><th class="alignleft">' . esc_html__('Public Keyset URL', LTI_Platform::get_plugin_name()) . '</th><td>' . esc_attr(get_option('siteurl') . '/?' . LTI_Platform::get_plugin_name() . '&amp;keys') . '</td></tr>' . "\n");
+    echo('            <tr><th class="alignleft">' . esc_html__('Authentication request URL', LTI_Platform::get_plugin_name()) . '</th><td>' . esc_attr(get_option('siteurl') . '/?' . LTI_Platform::get_plugin_name() . '&amp;auth') . '</td></tr>' . "\n");
     echo('          </tbody>' . "\n");
     echo('        </table>' . "\n");
     echo('      </div>' . "\n");

@@ -169,15 +169,16 @@ class LTI_Platform_Admin
                         if (!empty($value)) {
                             $res = openssl_pkey_get_private($value);
                             if ($res === false) {
-                                add_settings_error('general', 'settings_updated', __('Invalid private key.'), 'error');
+                                add_settings_error('general', 'settings_updated', __('Invalid private key.', $this->plugin_name),
+                                    'error');
                             } else {
                                 $details = openssl_pkey_get_details($res);
                                 if (($details === false) || (!isset($details['rsa']) && !isset($details['ec']))) {
                                     add_settings_error('general', 'settings_updated',
-                                        __('The private key must have a type of \'RSA\' or \'EC\'.'), 'error');
+                                        __('The private key must have a type of \'RSA\' or \'EC\'.', $this->plugin_name), 'error');
                                 } elseif (!isset($details['bits']) || ($details['bits'] < 2048)) {
                                     add_settings_error('general', 'settings_updated',
-                                        __('A private key with at least 2,048 bits is recommended.'), 'warning');
+                                        __('A private key with at least 2,048 bits is recommended.', $this->plugin_name), 'warning');
                                 }
                             }
                         }
@@ -305,8 +306,8 @@ class LTI_Platform_Admin
         );
         $roles = LTI_Platform::get_roles();
         foreach ($roles as $key => $role) {
-            add_settings_field("field_role_{$key}", __($role['name'], $this->plugin_name), array($this, 'field_role'),
-                $this->plugin_name, 'section_roles', array('label_for' => "id_role_{$key}", 'name' => "role_{$key}"));
+            add_settings_field("field_role_{$key}", $role['name'], array($this, 'field_role'), $this->plugin_name, 'section_roles',
+                array('label_for' => "id_role_{$key}", 'name' => "role_{$key}"));
         }
 
         add_settings_section(
@@ -339,7 +340,7 @@ class LTI_Platform_Admin
         add_settings_field('field_privatekey', __('Private key', $this->plugin_name), array($this, 'field_textarea'),
             $this->plugin_name, 'section_security',
             array('label_for' => 'id_privatekey', 'name' => 'privatekey', 'rows' => '10', 'cols' => '65',
-                'description' => 'A private key only needs to be defined when using LTI 1.3', 'placeholder' => "e.g.\n-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"));
+                'description' => 'A private key only needs to be defined when using LTI 1.3', 'placeholder' => 'e.g.&#10;-----BEGIN PRIVATE KEY-----&#10;...&#10;-----END PRIVATE KEY-----'));
         add_settings_field('field_storage', __('Offer platform storage to tools?', $this->plugin_name),
             array($this, 'field_checkbox'), $this->plugin_name, 'section_security',
             array('label_for' => 'id_storage', 'name' => 'storage', 'description' => 'Check this box to allow tools to use browser storage in the WordPress window'));
@@ -442,7 +443,7 @@ class LTI_Platform_Admin
         $textarea = LTI_Platform::getOption($args['name'], '');
         echo('<textarea id = " ' . esc_attr($args['label_for']) . '" class = "code" name = "' . esc_attr(LTI_Platform::get_settings_name()) . '[' . esc_attr($args['name']) . ']" class = "code" rows = "' . esc_attr($args['rows']) . '" cols = "' . esc_attr($args['cols']) . '"');
         if (!empty($args['placeholder'])) {
-            echo(' placeholder = "' . $args['placeholder'] . '"');
+            echo(' placeholder = "' . esc_attr($args['placeholder']) . '"');
         }
         echo('>');
         echo(esc_textarea($textarea));
