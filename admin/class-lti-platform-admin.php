@@ -21,6 +21,12 @@
  *  Contact: Stephen P Vickers <stephen@spvsoftwareproducts.com>
  */
 
+use ceLTIc\LTI\Util;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -30,8 +36,6 @@
  * @subpackage LTI_Platform/admin
  * @author     Stephen P Vickers <stephen@spvsoftwareproducts.com>
  */
-use ceLTIc\LTI\Util;
-
 class LTI_Platform_Admin
 {
 

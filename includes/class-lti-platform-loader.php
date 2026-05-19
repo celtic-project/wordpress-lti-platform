@@ -21,6 +21,10 @@
  *  Contact: Stephen P Vickers <stephen@spvsoftwareproducts.com>
  */
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 /**
  * Register all actions and filters for the plugin.
  *

@@ -40,6 +40,10 @@ use ceLTIc\LTI\Enum\LtiVersion;
  * @subpackage LTI_Platform/includes
  * @author     Stephen P Vickers <stephen@spvsoftwareproducts.com>
  */
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 class LTI_Platform
 {
 

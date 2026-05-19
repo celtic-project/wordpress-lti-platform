@@ -21,6 +21,10 @@
  *  Contact: Stephen P Vickers <stephen@spvsoftwareproducts.com>
  */
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 /**
  * This file is used to markup the page for the plugin's settings.
  *

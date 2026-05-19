@@ -21,6 +21,12 @@
  *  Contact: Stephen P Vickers <stephen@spvsoftwareproducts.com>
  */
 
+use ceLTIc\LTI\Tool;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 /**
  * Define the WordPress LTI Tool class.
  *
@@ -31,8 +37,6 @@
  * @subpackage LTI_Platform/includes
  * @author     Stephen P Vickers <stephen@spvsoftwareproducts.com>
  */
-use ceLTIc\LTI\Tool;
-
 class LTI_Platform_Tool extends Tool
 {
 
