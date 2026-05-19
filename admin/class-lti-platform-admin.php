@@ -268,6 +268,10 @@ class LTI_Platform_Admin
      */
     public function settings_init()
     {
+        global $title;
+
+        $title = '';
+
         register_setting($this->plugin_name, LTI_Platform::get_settings_name());
 
         add_settings_section(
