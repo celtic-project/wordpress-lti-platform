@@ -114,7 +114,6 @@ class LTI_Platform
         $this->version = LTI_PLATFORM_VERSION;
 
         $this->load_dependencies();
-        $this->set_locale();
         $this->define_admin_hooks();
         $this->define_public_hooks();
         $this->check_dependencies();
@@ -358,12 +357,6 @@ class LTI_Platform
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-lti-platform-loader.php';
 
         /**
-         * The class responsible for defining internationalization functionality
-         * of the plugin.
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-lti-platform-i18n.php';
-
-        /**
          * The class responsible for defining all actions that occur in the admin area.
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-lti-platform-admin.php';
@@ -399,22 +392,6 @@ class LTI_Platform
         }
 
         $this->loader = new LTI_Platform_Loader();
-    }
-
-    /**
-     * Define the locale for this plugin for internationalization.
-     *
-     * Uses the LTI_Platform_i18n class in order to set the domain and to register the hook
-     * with WordPress.
-     *
-     * @since    1.0.0
-     * @access   private
-     */
-    private function set_locale()
-    {
-        $plugin_i18n = new LTI_Platform_i18n();
-
-        $this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
     }
 
     /**
