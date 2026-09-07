@@ -31,6 +31,7 @@
  * @author     Stephen P Vickers <stephen@spvsoftwareproducts.com>
  */
 use ceLTIc\LTI;
+use ceLTIc\LTI\Platform;
 
 class LTI_Platform_Public
 {
@@ -312,6 +313,9 @@ class LTI_Platform_Public
         if ($ok) {
             $user = wp_get_current_user();
             LTI\Tool::$defaultTool = $tool;
+            if (property_exists('ceLTIc\\LTI\\Platform', 'initiateLoginUsingGet')) {
+                Platform::$initiateLoginUsingGet = $tool->initiateLoginUsingGet;
+            }
             $platform = $this->get_platform();
             if (!empty($link_atts['title'])) {
                 $title = $link_atts['title'];

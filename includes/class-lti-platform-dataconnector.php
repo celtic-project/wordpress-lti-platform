@@ -264,6 +264,8 @@ class DataConnector_wp extends DataConnector\DataConnector
             $tool->setSetting('__contentItemUrl');
             $tool->initiateLoginUrl = $tool->getSetting('__initiateLoginUrl');
             $tool->setSetting('__initiateLoginUrl');
+            $tool->initiateLoginUsingGet = $tool->getSetting('__initiateLoginUsingGet') === 'true';
+            $tool->setSetting('__initiateLoginUsingGet');
             $tool->redirectionUris = json_decode(str_replace('&quot;', '"', $tool->getSetting('__redirectionUris')), true);
             if (!is_array($tool->redirectionUris)) {
                 $tool->redirectionUris = array();
@@ -285,6 +287,7 @@ class DataConnector_wp extends DataConnector\DataConnector
             $tool->setSetting('__useContentItem', ($tool->useContentItem) ? 'true' : null);
             $tool->setSetting('__contentItemUrl', $tool->contentItemUrl);
             $tool->setSetting('__initiateLoginUrl', $tool->initiateLoginUrl);
+            $tool->setSetting('__initiateLoginUsingGet', ($tool->initiateLoginUsingGet) ? 'true' : null);
             $tool->setSetting('__redirectionUris', str_replace('"', '&quot;', wp_json_encode($tool->redirectionUris)));
             $tool->setSetting('__jku', $tool->jku);
             $tool->setSetting('__rsaKey', str_replace("\r\n", '&#13;&#10;', $tool->rsaKey ?? ''));

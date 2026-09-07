@@ -96,6 +96,13 @@ class LTI_Platform_Tool extends Tool
     public $contentItemUrl = null;
 
     /**
+     * Use GET method for initiate login request messages when true
+     *
+     * @var bool $initiateLoginUsingGet
+     */
+    public $initiateLoginUsingGet = false;
+
+    /**
      * Whether the tool has been moved to the trash bin.
      *
      * @since    1.0.0

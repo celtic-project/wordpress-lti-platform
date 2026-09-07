@@ -390,6 +390,21 @@ echo('          <td>' . "\n");
 echo('            <input id="id_initiateloginurl" type="url" value="' . esc_attr($tool->initiateLoginUrl) . '" name="initiateloginurl" class="large-text">' . "\n");
 echo('          </td>' . "\n");
 echo('        </tr>' . "\n");
+if (property_exists('ceLTIc\\LTI\\Platform', 'initiateLoginUsingGet')) {
+    echo('        <tr>' . "\n");
+    echo('          <th scope="row">' . "\n");
+    echo('            <label for="id_initiateusingget">' . "\n");
+    echo('              ' . esc_html__('Initiate login using GET?', LTI_Platform::get_plugin_name()) . "\n");
+    echo('            </label>' . "\n");
+    echo('          </th>' . "\n");
+    echo('          <td>' . "\n");
+    echo('            <input id="id_initiateusingget" type="checkbox" aria-required="false" value="true" name="initiateusingget"' . checked($tool->initiateLoginUsingGet,
+        true, false) . '>' . "\n");
+    echo('            <p class="description">' . esc_html__('Check this box to send Initiate Login requests to this tool using GET (rather than POST).',
+        LTI_Platform::get_plugin_name()) . '</p>' . "\n");
+    echo('          </td>' . "\n");
+    echo('        </tr>' . "\n");
+}
 echo('        <tr>' . "\n");
 echo('          <th scope="row">' . "\n");
 echo('            <label for="id_redirectionuris">' . "\n");

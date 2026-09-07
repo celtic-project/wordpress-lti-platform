@@ -628,6 +628,7 @@ class LTI_Platform_Admin
             $tool->setKey(!empty($_POST['consumerkey']) ? sanitize_text_field(wp_unslash($_POST['consumerkey'])) : null);
             $tool->secret = (!empty($_POST['sharedsecret'])) ? sanitize_text_field(wp_unslash($_POST['sharedsecret'])) : null;
             $tool->initiateLoginUrl = !empty($_POST['initiateloginurl']) ? sanitize_text_field(wp_unslash($_POST['initiateloginurl'])) : null;
+            $tool->initiateLoginUsingGet = !empty($_POST['initiateusingget']) && (sanitize_text_field(wp_unslash($_POST['initiateusingget'])) === 'true');
             $redirectionUris = !empty($_POST['redirectionuris']) ? trim(sanitize_textarea_field(wp_unslash($_POST['redirectionuris']))) : null;
             if (!empty($redirectionUris)) {
                 $tool->redirectionUris = explode("\r\n", $redirectionUris);
